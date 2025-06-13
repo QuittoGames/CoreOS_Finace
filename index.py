@@ -2,20 +2,24 @@ from data import data
 from tool import tool
 import asyncio
 import sys
-from PySide6.QtWidgets import QApplication, QWidget
+from PySide6.QtWidgets import QApplication, QWidget, QMainWindow
 
 data_local = data()
 app = QApplication(sys.argv)
 
-class Main(app):
+class Main(QMainWindow):
     @staticmethod
     def Start():
-        pass
+        tool.clear_screen()
+        print("oi")
+        app.quit()
 
-def main():
-    pass
+async def main() -> None:
+    asyncio.create_task(tool.verify_modules())
+    asyncio.create_task(tool.add_path_modules(data_local))
+    return
 
 
 if __name__ == "__main__":
-    main()
-    asyncio.run(Main.Start())
+    asyncio.run(main())
+    Main.Start()

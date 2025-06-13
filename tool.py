@@ -16,7 +16,7 @@ class tool:
     async def verify_modules():
         try:
             # #Uso Do modules por txt
-            req_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "modules", "requirements.txt"))
+            req_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "requirements", "requirements.txt"))
             subprocess.run([sys.executable, "-m", "pip", "install", "-r", req_path], check=True)
         except Exception as E:
             print(f"Erro Na Verificaçao De Modulos, Erro: {E}")
