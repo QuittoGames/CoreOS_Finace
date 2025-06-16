@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 
 @dataclass
-class Recita:
+class Item:
     _ID: int
     _name: str
     _descr: str
+    _type: str
     _coin: str  # Money Type (Real, BTC, Dólar)
 
     def getID(self):
