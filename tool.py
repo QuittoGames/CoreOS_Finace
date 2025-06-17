@@ -33,3 +33,16 @@ class tool:
             print(f"Erro Al Adicionar Os Caminhos Brutos, Erro: {E}")
             return
     
+    def create_json(path:str) -> None:
+        try:
+            os.makedirs("data","w")
+            data_json = os.path.join("data")
+            with open(data_json , "w") as file:
+                file.write(data.json_formart)
+        except PermissionError:
+            print("Erro: Sem permissão para criar arquivo ou pasta.")
+        except FileNotFoundError:
+            print("Erro: Pasta não encontrada.")
+        except OSError as e:
+            print(f"Erro do sistema: {e}")
+        return
