@@ -8,16 +8,19 @@ class Item:
     _type: str
     _coin: str  # Money Type (Real, BTC, Dólar)
 
-    def getID(self):
+    def getID(self) -> None:
         return self.ID 
     
-    def getName(self):
+    def getName(self) -> None:
         return self.name
     
-    def getDesc(self):
+    def getDesc(self) -> None:
         return self.descr
     
-    def getCoin(self):
+    def getType(self) -> None:
+        return self._type
+    
+    def getCoin(self) -> None:
         return self.coin
 
     def __str__(self):

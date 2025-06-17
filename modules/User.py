@@ -1,5 +1,9 @@
 from dataclasses import dataclass
 from decimal import Decimal
+import os
+import sys
+sys.path.append(os.path.abspath(".."))
+from data import data
 
 @dataclass
 class User:
@@ -8,3 +12,6 @@ class User:
     receita = []
     gastos = []
     extrato = []
+
+    async def set_values(data_local: data):
+        pass

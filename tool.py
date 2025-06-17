@@ -33,5 +33,3 @@ class tool:
             print(f"Erro Al Adicionar Os Caminhos Brutos, Erro: {E}")
             return
     
-    async def set_values(data_local: data):
-        pass
