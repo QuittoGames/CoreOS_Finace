@@ -1,4 +1,7 @@
 from dataclasses import dataclass
+from random import randint
+from tool import tool
+from data import data
 
 @dataclass
 class Item:
@@ -8,20 +11,32 @@ class Item:
     _type: str
     _coin: str  # Money Type (Real, BTC, Dólar)
 
-    def getID(self) -> None:
+    def getID(self) -> str:
         return self.ID 
     
-    def getName(self) -> None:
+    def getName(self) -> str:
         return self.name
     
-    def getDesc(self) -> None:
+    def getDesc(self) -> str:
         return self.descr
     
-    def getType(self) -> None:
+    def getType(self) -> str:
         return self._type
     
-    def getCoin(self) -> None:
+    def getCoin(self) -> str:
         return self.coin
+    
+    @classmethod
+    def generete_nunber(self) -> int:
+        id_local = randint(0,1000)
+        IDs = []
+        for i in ["receita", "gastos"]:
+            if i in data.json_data:
+                IDs += [i["id"] for i in data.json_data[i]] # Sum Arry [0,1,2,3] + [4,5,6,7] = [0,1,2,3,4,5,6,7] sim quase niguem lembra disso
+        if not tool.binary_search(array = IDs, target = id_local):
+            self.generete_nunber()
+            return
+        return id_local
 
     def __str__(self):
         return (

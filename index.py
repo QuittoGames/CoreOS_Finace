@@ -15,6 +15,7 @@ class Main(QMainWindow):
     def Start():
         tool.clear_screen()
         print(user.saldo)
+        print(user.gastos)
         app.quit()
 
 async def main() -> None:

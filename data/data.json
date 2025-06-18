@@ -25,16 +25,8 @@
       "id": 2,
       "name": "Aluguel",
       "descr": "Despesa mensal",
-      "type": "Despesa",
+      "type": "Gasto",
       "coin": "BRL"
-    }
-  ],
-  "extrato": [
-    {
-      "data": "2025-06-17",
-      "descricao": "Depósito",
-      "valor": 500.00,
-      "tipo": "credito"
     }
   ]
 }
