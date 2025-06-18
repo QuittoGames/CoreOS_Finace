@@ -15,7 +15,7 @@ class Main(QMainWindow):
     def Start():
         tool.clear_screen()
         print(user.saldo)
-        print(user.gastos)
+        print(user.extrato)
         app.quit()
 
 async def main() -> None:
@@ -23,7 +23,6 @@ async def main() -> None:
     asyncio.create_task(tool.add_path_modules(data_local))
     await asyncio.create_task(user.set_values(data_local= data_local))
     return
-
 
 if __name__ == "__main__":
     asyncio.run(main())

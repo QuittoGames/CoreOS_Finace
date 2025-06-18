@@ -46,6 +46,16 @@ class User:
             _type = ap["type"],
             _coin = ap["coin"],
         ) for ap in data.json_data["gastos"]]
+
+        self.receita = [Item(
+            _ID = Item.generete_nunber(),
+            _name = ap["name"],
+            _descr = ap["descr"],
+            _type = ap["type"],
+            _coin = ap["coin"],
+        ) for ap in data.json_data["receita"]]
+
+        self.extrato = self.receita + self.gastos
         return
         
         
