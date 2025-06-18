@@ -1,0 +1,32 @@
+{
+  "saldo": 190.50,
+  "aplicacoes": [
+    {
+      "name": "CDB Banco X",
+      "taxa_juros": 10.5,
+      "type": "Renda Fixa",
+      "moeda": "BRL",
+      "min_aporte": 100.00,
+      "prazo_meses": 12,
+      "liquidez": 30
+    }
+  ],
+  "receita": [
+    {
+      "id": 1,
+      "name": "Salário",
+      "descr": "Recebimento mensal",
+      "type": "Receita",
+      "coin": "BRL"
+    }
+  ],
+  "gastos": [
+    {
+      "id": 2,
+      "name": "Aluguel",
+      "descr": "Despesa mensal",
+      "type": "Gasto",
+      "coin": "BRL"
+    }
+  ]
+}

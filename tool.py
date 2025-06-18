@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import sys
 import subprocess
 from data import data
+from random import randint
 
 @dataclass
 class tool:
@@ -32,4 +33,35 @@ class tool:
         except Exception as E:
             print(f"Erro Al Adicionar Os Caminhos Brutos, Erro: {E}")
             return
-                    
+    
+    # In Dev
+    def create_json(path:str) -> None:
+        try:
+            os.makedirs("data",exist_ok=True)
+            data_json = os.path.join("data")
+            with open(data_json , "w") as file:
+                file.write(data.json_formart)
+        except PermissionError:
+            print("Erro: Sem permissão para criar arquivo ou pasta.")
+        except FileNotFoundError:
+            print("Erro: Pasta não encontrada.")
+        except OSError as e:
+            print(f"Erro do sistema: {e}")
+        return
+    
+    def binary_search(array: list, target: int) -> int:
+        low = 0
+        high = len(array) - 1
+
+        while low <= high:
+            mid = (low + high) // 2
+            guess = array[mid]
+
+            if guess == target:
+                return mid 
+            elif guess < target:
+                low = mid + 1 
+            else:
+                high = mid - 1 
+
+        return None
