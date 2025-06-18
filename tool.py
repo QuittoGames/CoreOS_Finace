@@ -49,6 +49,13 @@ class tool:
             print(f"Erro do sistema: {e}")
         return
     
+    def menu(data_local:data,user):
+        tool.clear_screen()   
+        print("_"*30 + "Core OS Finace" + "_"*30)
+        print(f"Ola: {user.name}")
+        print("_"*60)
+        print("1. View Extrato")
+
     def binary_search(array: list, target: int) -> int:
         low = 0
         high = len(array) - 1

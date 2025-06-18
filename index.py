@@ -5,6 +5,7 @@ import sys
 from PySide6.QtWidgets import QApplication, QWidget, QMainWindow
 from decimal import Decimal
 from modules.User import User
+from time import sleep    
 
 data_local = data()
 user = User()
@@ -14,8 +15,22 @@ class Main(QMainWindow):
     @staticmethod
     def Start():
         tool.clear_screen()
-        print(user.saldo)
-        print(user.extrato)
+        tool.menu(data_local,user)
+        try:
+            c = input("Digite Sua Opiçao: ").strip().lower()
+            if c == "1":
+                tool.clear_screen()
+                user.getExtrato()
+                s = input("Presione Qualquer Tecla Para sair: ")
+                Main.Start()
+                return
+            else:
+                Main.Start()
+                return
+        except Exception as E:
+            print(f"Erro no input, Erro: {E}")
+            Main.Start()
+            return
         app.quit()
 
 async def main() -> None:

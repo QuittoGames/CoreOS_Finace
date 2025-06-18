@@ -1,4 +1,5 @@
 {
+  "name": "Quitto",
   "saldo": 190.50,
   "aplicacoes": [
     {
@@ -14,7 +15,7 @@
   "receita": [
     {
       "id": 1,
-      "name": "Salário",
+      "name": "Salario",
       "descr": "Recebimento mensal",
       "type": "Receita",
       "coin": "BRL"
