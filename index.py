@@ -24,12 +24,18 @@ class Main(QMainWindow):
                 s = input("Presione Qualquer Tecla Para sair: ")
                 Main.Start()
                 return
+            elif c == "2":
+                pass
+            elif c == "3":
+                return
             else:
                 Main.Start()
                 return
         except Exception as E:
             print(f"Erro no input, Erro: {E}")
             Main.Start()
+            return
+        except KeyboardInterrupt as E:
             return
         app.quit()
 
