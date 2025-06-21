@@ -28,15 +28,15 @@ class Item:
     
     @classmethod
     def generete_nunber(self) -> int:
-        id_local = randint(0,1000)
         IDs = []
         for i in ["receita", "gastos"]:
             if i in data.json_data:
                 IDs += [i["id"] for i in data.json_data[i]] # Sum Arry [0,1,2,3] + [4,5,6,7] = [0,1,2,3,4,5,6,7] sim quase niguem lembra disso
-        if not tool.binary_search(array = IDs, target = id_local):
-            self.generete_nunber()
-            return
-        return id_local
+        
+        while True:
+            id_local = randint(0,1000)
+            if tool.binary_search(array = IDs, target = id_local):
+                return id_local
 
     def __str__(self):
         return (
