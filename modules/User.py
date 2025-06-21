@@ -14,6 +14,7 @@ import json
 @dataclass
 class User:
     saldo:Decimal = (0.0)
+    name:str = ""
     aplicaçoes: list = field(default_factory=list)
     receita: list = field(default_factory=list)
     gastos: list = field(default_factory=list)
@@ -28,6 +29,7 @@ class User:
             data.json_data = json.loads(data.json_data)  # ← CONVERTE de string JSON para dict
 
         self.saldo = Decimal(str(data.json_data["saldo"]))
+        self.name = str(data.json_data["name"])
         #For in Json
         self.aplicaçoes = [Aplicao(
             _name=ap["name"],
@@ -57,5 +59,37 @@ class User:
 
         self.extrato = self.receita + self.gastos
         return
-        
+    
+    def getExtrato(self):
+        print("=" * 50)
+        print("📄  EXTRATO FINANCEIRO".center(50))
+        print("=" * 50)
+        print(f"💰  Saldo atual: R$ {self.saldo:.2f}".center(50))
+        print("-" * 50)
+
+        categorias = [
+            ("📈 RECEITAS", self.receita),
+            ("📉 GASTOS", self.gastos),
+            ("📊 APLICAÇÕES", self.aplicaçoes)
+        ]
+
+        for titulo, lista in categorias:
+            print(f"\n{titulo}")
+            print("─" * 50)
+
+            if not lista:
+                print("  ⚠️  Nenhum item cadastrado.\n")
+                continue
+
+            for item in lista:
+                print("┌" + "─" * 48 + "┐")
+                for attr, value in item.__dict__.items():
+                    nome = attr[1:] if attr.startswith("_") else attr
+                    print(f"│ {nome.capitalize():<15}: {str(value):<29}│")
+                print("└" + "─" * 48 + "┘")
+
+        print("=" * 50)
+
+
+
         
