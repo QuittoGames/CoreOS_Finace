@@ -12,32 +12,11 @@ user = User()
 app = QApplication(sys.argv)
 
 class Main(QMainWindow):
-    @staticmethod
-    def Start():
-        tool.clear_screen()
-        tool.menu(data_local,user)
-        try:
-            c = input("Digite Sua Opiçao: ").strip().lower()
-            if c == "1":
-                tool.clear_screen()
-                user.getExtrato()
-                s = input("Presione Qualquer Tecla Para sair: ")
-                Main.Start()
-                return
-            elif c == "2":
-                pass
-            elif c == "3":
-                return
-            else:
-                Main.Start()
-                return
-        except Exception as E:
-            print(f"Erro no input, Erro: {E}")
-            Main.Start()
-            return
-        except KeyboardInterrupt as E:
-            return
-        app.quit()
+    def __init__(self):
+        super().__init__()
+
+        self.show()
+        # app.quit()
 
 async def main() -> None:
     asyncio.create_task(tool.verify_modules())
@@ -47,4 +26,4 @@ async def main() -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
-    Main.Start()
+    Main()
