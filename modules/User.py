@@ -89,6 +89,11 @@ class User:
                 print("└" + "─" * 48 + "┘")
 
         print("=" * 50)
+    
+    def getSaldo(self,data_local:data) -> str:
+        if data_local.show_saldo:
+            return str(self.saldo)
+        return "".join(["*" for i in range(len(str(self.saldo)))])
 
 
 
