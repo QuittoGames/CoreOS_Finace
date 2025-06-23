@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from random import randint
 from tool import tool
 from data import data
+from decimal import Decimal
 
 @dataclass
 class Item:
@@ -10,6 +11,7 @@ class Item:
     _descr: str
     _type: str
     _coin: str  # Money Type (Real, BTC, Dólar)
+    _value: Decimal = (0.0)
 
     def getID(self) -> str:
         return self.ID 
@@ -25,6 +27,9 @@ class Item:
     
     def getCoin(self) -> str:
         return self.coin
+    
+    def getValue(self):
+        return self._value
     
     @classmethod
     def generete_nunber(self) -> int:

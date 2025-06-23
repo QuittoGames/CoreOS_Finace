@@ -39,7 +39,7 @@ class UI:
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-size: 14px;
             color: #ECECEE;           /* cor do texto */
-            background-color: #202121; /* cor de fundo */
+            background-color: {#202121;} /* cor de fundo */
         }
 
         /* Para o widget principal (QWidget) */

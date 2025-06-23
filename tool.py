@@ -58,11 +58,7 @@ class tool:
         print("1. View Extrato")
         print("2. Config")
         print("3. Exit")
-    
-    def hide_money(data_local:data ,user) -> str:
-        if data_local.show_saldo:
-            return str(user.saldo)
-        return "*****"
+
 
     def binary_search(array: list, target: int) -> int:
         low = 0
