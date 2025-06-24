@@ -69,7 +69,3 @@ class User:
         if data_local.show_saldo:
             return str(self.saldo)
         return "".join(["*" for i in range(len(str(self.saldo)))])
-
-
-
-        

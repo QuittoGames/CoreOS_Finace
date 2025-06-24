@@ -11,7 +11,6 @@ from time import sleep
 
 data_local = data()
 user = User()
-
 UI_local = UI()
 
 class Main(QMainWindow):
@@ -54,6 +53,7 @@ class Main(QMainWindow):
 
         # Wingets 
         upper_money = QFrame()
+        upper_money.setStyleSheet("margin: 5px;")
         upper_money.setStyleSheet("""background: qlineargradient(
                 x1: 0, y1: 0,
                 x2: 1, y2: 0,
@@ -62,7 +62,7 @@ class Main(QMainWindow):
             );
             border-radius: 5px;
         """)
-        upper_money.setFixedSize(250, 50)
+        upper_money.setFixedSize(200, 52)
 
         # Criar layout dentro do upper_money
         layout_frame_content = QVBoxLayout(upper_money)
@@ -70,7 +70,9 @@ class Main(QMainWindow):
         layout_frame_content.setAlignment(Qt.AlignTop | Qt.AlignLeft)  # alinhamento
 
         lucro_label = QLabel(f"Lucro: {user.lucro}",upper_money)
-        lucro_label.setStyleSheet("background-color: transparent; text-align: center;")
+        lucro_label.setStyleSheet("background-color: transparent; color: #fff; padding: 0; margin: 0;")
+        lucro_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        lucro_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         lucro_font = lucro_label.font()
         lucro_font.setPointSize(UI_local.fontTilteSize - 4)
         lucro_label.setFont(lucro_font)
