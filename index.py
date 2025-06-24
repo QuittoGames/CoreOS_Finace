@@ -69,7 +69,8 @@ class Main(QMainWindow):
         layout_frame_content.setContentsMargins(5, 10, 0, 0)  # margens internas do frame
         layout_frame_content.setAlignment(Qt.AlignTop | Qt.AlignLeft)  # alinhamento
 
-        lucro_label = QLabel(f"Lucro: {user.lucro}")
+        lucro_label = QLabel(f"Lucro: {user.lucro}",upper_money)
+        lucro_label.setStyleSheet("background-color: transparent; text-align: center;")
         lucro_font = lucro_label.font()
         lucro_font.setPointSize(UI_local.fontTilteSize - 4)
         lucro_label.setFont(lucro_font)
@@ -78,15 +79,16 @@ class Main(QMainWindow):
         layout_frame_content.addWidget(lucro_label)
 
         #Add Wingets In Layout
-        main_layout.addWidget(top_bar)
-        main_layout.addWidget(upper_money, alignment=Qt.AlignCenter)
+        main_layout.addWidget(top_bar,alignment=Qt.AlignLeft | Qt.AlignTop)
+        main_layout.addWidget(upper_money, alignment=Qt.AlignLeft | Qt.AlignTop)
+        main_layout.addStretch(stretch=20)
         
         # Windows Class
         container = QWidget()
         container.setLayout(main_layout)
         self.setCentralWidget(container)
         self.show()    
-        # app.quit()
+        app.quit()
 
 async def main() -> None:
     if not data_local.Debug: asyncio.create_task(tool.verify_modules())
