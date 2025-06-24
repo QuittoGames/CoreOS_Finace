@@ -18,7 +18,8 @@
       "name": "Salario",
       "descr": "Recebimento mensal",
       "type": "Receita",
-      "coin": "BRL"
+      "coin": "BRL",
+      "value": 5000
     }
   ],
   "gastos": [
@@ -27,7 +28,8 @@
       "name": "Aluguel",
       "descr": "Despesa mensal",
       "type": "Gasto",
-      "coin": "BRL"
+      "coin": "BRL",
+      "value": 105
     }
   ]
 }

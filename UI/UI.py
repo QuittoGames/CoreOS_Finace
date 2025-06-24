@@ -16,6 +16,8 @@ class UI:
         "black_third":"#333333",
         "blue":"#1438E9",
         "blue_second":"#0655FF",
+        "green": "#1F8A70",           # verde principal forte e elegante
+        "green_second": "#1AE421",    # verde secundário mais vibrante
         "white":"#ECECEE",
     })
 
@@ -39,7 +41,7 @@ class UI:
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-size: 14px;
             color: #ECECEE;           /* cor do texto */
-            background-color: #202121; /* cor de fundo */
+            background-color: {#202121;} /* cor de fundo */
         }
 
         /* Para o widget principal (QWidget) */
