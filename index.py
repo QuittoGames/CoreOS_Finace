@@ -38,7 +38,7 @@ class Main(QMainWindow):
         font = welcome_title.font()
         font.setPointSize(UI_local.fontTilteSize)
         welcome_title.setFont(font) 
-        layout_top.addWidget(welcome_title, alignment=Qt.AlignTop | Qt.AlignVCenter)
+        layout_top.addWidget(welcome_title, alignment=Qt.AlignTop | Qt.AlignVCenter) 
         
         layout_top.setSpacing(5)
         
@@ -61,6 +61,7 @@ class Main(QMainWindow):
                 stop: 1 #1438E9
             );
             border-radius: 5px;
+            pading-right: 8px; 
         """)
         upper_money.setFixedSize(200, 52)
 
@@ -69,20 +70,39 @@ class Main(QMainWindow):
         layout_frame_content.setContentsMargins(5, 10, 0, 0)  # margens internas do frame
         layout_frame_content.setAlignment(Qt.AlignTop | Qt.AlignLeft)  # alinhamento
 
-        lucro_label = QLabel(f"Lucro: {user.lucro}",upper_money)
-        lucro_label.setStyleSheet("background-color: transparent; color: #fff; padding: 0; margin: 0;")
+        lucro_label = QLabel(f"Lucro: R${user.lucro}",upper_money)
+        lucro_label.setStyleSheet("color: #fff; background-color: transparent; padding: 0px; margin: 0px;")
+        lucro_label.setMinimumHeight(30)
         lucro_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         lucro_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         lucro_font = lucro_label.font()
         lucro_font.setPointSize(UI_local.fontTilteSize - 4)
         lucro_label.setFont(lucro_font)
-
+    
         # Adiciona o label no layout do upper_money
         layout_frame_content.addWidget(lucro_label)
 
+        Wimget_2 = QFrame()
+        Wimget_2.setFixedSize(300, 300)
+        # Corrige o erro de digitação no estilo do Wimget_2
+        Wimget_2.setStyleSheet(f"""
+            background-color: {UI_local.getColors()["black_second"]};
+            border-radius: 5px;
+            padding: 8px;
+        """)
+
+        # Layout horizontal só para os dois frames lado a lado
+        layout_horizontal_widgets = QHBoxLayout()
+        layout_horizontal_widgets.setSpacing(8)  # Espaçamento entre os dois frames
+        layout_horizontal_widgets.setContentsMargins(0, 0, 0, 0)
+        layout_horizontal_widgets.addWidget(upper_money)
+        layout_horizontal_widgets.addWidget(Wimget_2)
+
         #Add Wingets In Layout
         main_layout.addWidget(top_bar,alignment=Qt.AlignLeft | Qt.AlignTop)
+        main_layout.addLayout(layout_horizontal_widgets,stretch=20)
         main_layout.addWidget(upper_money, alignment=Qt.AlignLeft | Qt.AlignTop)
+        main_layout.addWidget(Wimget_2,alignment=Qt.AlignLeft | Qt.AlignTop)
         main_layout.addStretch(stretch=20)
         
         # Windows Class

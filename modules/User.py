@@ -24,10 +24,13 @@ class User:
     async def set_values(self,data_local: data):
         path = os.path.join(data.data_json_path)
         if not os.path.exists(path=path):tool.create_json(path)
+        key = data_local.getKey()
 
         with open(data.data_json_path, "r+") as file:
             data.json_data = file.read()
-            data.json_data = json.loads(data.json_data)  # ← CONVERTE de string JSON para dict
+            raw_dict = json.loads(data.json_data)
+            if data_local.Debug: print("DEBUG saldo:", type(data.json_data.get("saldo")))
+            data.json_data = tool.decrypt_value(value_local=raw_dict,fernet=key)     # ← CONVERTE de string JSON para dict
 
         self.saldo = Decimal(str(data.json_data["saldo"]))
         self.name = str(data.json_data["name"])

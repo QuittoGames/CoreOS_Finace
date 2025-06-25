@@ -52,3 +52,4 @@ class UI:
             font-size: 14px;
         }
     """
+
