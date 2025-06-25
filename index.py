@@ -95,7 +95,6 @@ class Main(QMainWindow):
         layout_horizontal_widgets = QHBoxLayout()
         layout_horizontal_widgets.setSpacing(8)  # Espaçamento entre os dois frames
         layout_horizontal_widgets.setContentsMargins(0, 0, 0, 0)
-        layout_horizontal_widgets.addWidget(upper_money)
         layout_horizontal_widgets.addWidget(Wimget_2)
 
         #Add Wingets In Layout
