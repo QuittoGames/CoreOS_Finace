@@ -1,4 +1,3 @@
 requests
-winotify
-opencv-python
-mss
+PySide6
+cryptography

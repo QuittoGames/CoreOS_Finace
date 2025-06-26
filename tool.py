@@ -5,6 +5,8 @@ import sys
 import subprocess
 from data import data
 from random import randint
+from cryptography.fernet import Fernet
+import base64
 
 @dataclass
 class tool:
@@ -59,7 +61,6 @@ class tool:
         print("2. Config")
         print("3. Exit")
 
-
     def binary_search(array: list, target: int) -> int:
         low = 0
         high = len(array) - 1
@@ -76,3 +77,23 @@ class tool:
                 high = mid - 1 
 
         return None
+
+    def decrypt_value(value_local, fernet: Fernet) -> dict:
+        if isinstance(value_local, str):
+            try:
+                enc_bytes = base64.urlsafe_b64decode(value_local.encode())
+                dec = fernet.decrypt(enc_bytes).decode()
+                # Tenta converter pra número, se possível
+                if dec.isdigit():
+                    return int(dec)
+                try:
+                    return float(dec)
+                except:
+                    return dec
+            except Exception:
+                return value_local
+        elif isinstance(value_local, list):
+            return [tool.decrypt_value(v, fernet) for v in value_local]
+        elif isinstance(value_local, dict):
+            return {k: tool.decrypt_value(v, fernet) for k, v in value_local.items()}
+        return value_local

@@ -9,6 +9,7 @@ from tool import tool
 from time import sleep
 from modules.Aplicao import Aplicao
 from modules.Item import Item
+from cryptography.fernet import Fernet
 import json
 
 @dataclass
@@ -24,10 +25,13 @@ class User:
     async def set_values(self,data_local: data):
         path = os.path.join(data.data_json_path)
         if not os.path.exists(path=path):tool.create_json(path)
+        key = data_local.getKey()
+        fernet = Fernet(key=key)
 
         with open(data.data_json_path, "r+") as file:
-            data.json_data = file.read()
-            data.json_data = json.loads(data.json_data)  # ← CONVERTE de string JSON para dict
+            data.json_data = json.loads(file.read())
+            if data_local.Debug: print("DEBUG saldo:", data_local.json_data.get("saldo"),type(data.json_data.get("saldo")))
+            data.json_data = tool.decrypt_value(value_local=data.json_data, fernet=fernet)     # ← CONVERTE de string JSON para dict
 
         self.saldo = Decimal(str(data.json_data["saldo"]))
         self.name = str(data.json_data["name"])
