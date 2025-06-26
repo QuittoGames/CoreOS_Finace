@@ -3,6 +3,7 @@ from tool import tool
 import asyncio
 import sys
 from PySide6.QtWidgets import *
+from PySide6.QtCore import *
 from decimal import Decimal
 from modules.User import User
 from UI.UI import UI
