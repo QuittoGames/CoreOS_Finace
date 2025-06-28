@@ -10,6 +10,7 @@ from time import sleep
 from modules.Aplicao import Aplicao
 from modules.Item import Item
 from cryptography.fernet import Fernet
+from modules.Item import Item   
 import json
 
 @dataclass
@@ -73,3 +74,10 @@ class User:
         if data_local.show_saldo:
             return str(self.saldo)
         return "".join(["*" for i in range(len(str(self.saldo)))])
+
+    def addItem(self,Item:Item) -> None: # Neste caso o else e nessesario
+        if Item.getType == "Receita":
+            self.receita.append(Item)
+        else:
+            self.gastos.append(Item)
+        self.extrato.append(Item)

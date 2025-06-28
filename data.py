@@ -17,7 +17,7 @@ class data:
     def getKey(self) -> str:
         try:
             if not os.path.exists(os.path.join("data", ".env", "key.key")):raise FileNotFoundError("File Not Exit")
-
+    
             with open("data\.env\key.key", "rb") as file:
                 self._key_json = file.read()
                 return self._key_json

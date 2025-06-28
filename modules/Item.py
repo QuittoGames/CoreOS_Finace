@@ -41,8 +41,8 @@ class Item:
         while True:
             id_local = randint(0,1000)
             if tool.binary_search(array = IDs, target = id_local):
-                return id_local
-
+                return id_local   
+    
     def __str__(self):
         return (
             f"[RECEITA]\n"

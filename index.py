@@ -28,7 +28,8 @@ class Main(QMainWindow):
         self.setStyleSheet(UI_local.getStyleCSS())
         
         #Background
-        self.setStyleSheet(f"background-color: {UI_local.getColors()["black"]};")
+        # self.setStyleSheet(f"background-color: {UI_local.getColors()["black"]};")
+        self.setStyleSheet(f"background-color: trasparent;")
 
         #Top Bar
         top_bar = QFrame()
@@ -61,7 +62,6 @@ class Main(QMainWindow):
                 stop: 1 #1438E9
             );
             border-radius: 5px;
-            pading-right: 8px; 
         """)
         upper_money.setFixedSize(200, 52)
 
@@ -109,7 +109,7 @@ class Main(QMainWindow):
         container.setLayout(main_layout)
         self.setCentralWidget(container)
         self.show()    
-        app.quit()
+        # app.quit()
 
 async def main() -> None:
     if not data_local.Debug: asyncio.create_task(tool.verify_modules())
