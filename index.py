@@ -4,120 +4,112 @@ import asyncio
 import sys
 from PySide6.QtWidgets import *
 from PySide6.QtCore import *
-from decimal import Decimal
 from modules.User import User
 from UI.UI import UI
 from time import sleep    
+from UI.Sidebar import SideBar
+from UI.MainContent import MainContent
 
 data_local = data()
 user = User()
 UI_local = UI()
 
 class Main(QMainWindow):
-    def __init__(self):
+    def __init__(self, UI_local: UI, user: User, data_local: data):
         super().__init__()
-
-        #Layout Base
-        main_layout = QVBoxLayout()
-        main_layout.setSpacing(20)
-        main_layout.setContentsMargins(30, 30, 30, 30)
+        if data_local.Debug:print("[DEBUG] Criando janela Main()")
+        
+        self.UI_local = UI_local
+        self.user = user
+        self.data_local = data_local
+        self.sidebar_visible = True
+        
+        self.init_ui()
+        
+    def init_ui(self):
+        self.setWindowTitle("Core OS Finance")
+        self.setGeometry(*self.UI_local.getCenter())
+        self.setStyleSheet(self.UI_local.getStyleCSS())
+        
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        
+        main_layout = QHBoxLayout(central_widget)
+        main_layout.setSpacing(0)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # Sidebar
+        self.sidebar = SideBar(central_widget, self.UI_local)
+        main_layout.addWidget(self.sidebar)
+        
+        # Área do conteúdo principal
+        content_area = QFrame()
+        content_layout = QVBoxLayout(content_area)
+        content_layout.setSpacing(0)
+        content_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # Header com toggle button
+        header = self.create_header()
+        content_layout.addWidget(header)
+        
+        # Conteúdo principal — passa UI_local, user e data_local
+        self.main_content = MainContent(content_area, self.UI_local,user, self.data_local)
+        content_layout.addWidget(self.main_content)
+        
+        main_layout.addWidget(content_area)
+        
+        self.show()
     
-        #Windows
-        self.setWindowTitle("Core OS Finace")
-        self.setGeometry(*UI_local.getCenter()) # * Desempacota A Tuple
-        self.setStyleSheet(UI_local.getStyleCSS())
-        
-        #Background
-        # self.setStyleSheet(f"background-color: {UI_local.getColors()["black"]};")
-        self.setStyleSheet(f"background-color: trasparent;")
-
-        #Top Bar
-        top_bar = QFrame()
-        layout_top = QVBoxLayout(top_bar)
-
-        welcome_title = QLabel(f"Bem Vindo, {user.name}")
-        font = welcome_title.font()
-        font.setPointSize(UI_local.fontTilteSize)
-        welcome_title.setFont(font) 
-        layout_top.addWidget(welcome_title, alignment=Qt.AlignTop | Qt.AlignVCenter) 
-        
-        layout_top.setSpacing(5)
-        
-        #Saldo Top_Bar
-        saldo_show = QLabel(f"Saldo: {user.getSaldo(data_local)}")
-        saldo_font = saldo_show.font()
-        saldo_font.setPointSize(UI_local.fontTilteSize - 5)
-        saldo_show.setFont(saldo_font)
-        layout_top.addWidget(saldo_show, alignment=Qt.AlignTop | Qt.AlignVCenter)
-
-        layout_top.addStretch()  # empurra o saldo pro canto direito
-
-        # Wingets 
-        upper_money = QFrame()
-        upper_money.setStyleSheet("margin: 5px;")
-        upper_money.setStyleSheet("""background: qlineargradient(
-                x1: 0, y1: 0,
-                x2: 1, y2: 0,
-                stop: 0 #0655FF,
-                stop: 1 #1438E9
-            );
-            border-radius: 5px;
+    def create_header(self):
+        header = QFrame()
+        header.setFixedHeight(50)
+        header.setStyleSheet(f"""
+            QFrame {{
+                background-color: {self.UI_local.getColors()["black"]};
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }}
         """)
-        upper_money.setFixedSize(200, 52)
-
-        # Criar layout dentro do upper_money
-        layout_frame_content = QVBoxLayout(upper_money)
-        layout_frame_content.setContentsMargins(5, 10, 0, 0)  # margens internas do frame
-        layout_frame_content.setAlignment(Qt.AlignTop | Qt.AlignLeft)  # alinhamento
-
-        lucro_label = QLabel(f"Lucro: R${user.lucro}",upper_money)
-        lucro_label.setStyleSheet("color: #fff; background-color: transparent; padding: 0px; margin: 0px;")
-        lucro_label.setMinimumHeight(30)
-        lucro_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        lucro_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        lucro_font = lucro_label.font()
-        lucro_font.setPointSize(UI_local.fontTilteSize - 4)
-        lucro_label.setFont(lucro_font)
+        
+        layout = QHBoxLayout(header)
+        layout.setContentsMargins(20, 0, 20, 0)
+        
+        toggle_btn = QPushButton("☰")
+        toggle_btn.setFixedSize(40, 40)
+        toggle_btn.setStyleSheet("""
+            QPushButton {
+                background-color: transparent;
+                color: white;
+                border: none;
+                font-size: 18px;
+                border-radius: 5px;
+            }
+            QPushButton:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+        """)
+        toggle_btn.clicked.connect(self.toggle_sidebar)
+        
+        layout.addWidget(toggle_btn)
+        layout.addStretch()
+        
+        return header
     
-        # Adiciona o label no layout do upper_money
-        layout_frame_content.addWidget(lucro_label)
+    def toggle_sidebar(self):
+        if self.sidebar_visible:
+            self.sidebar.hide()
+            self.sidebar_visible = False
+        self.sidebar.show()
+        self.sidebar_visible = True
 
-        Wimget_2 = QFrame()
-        Wimget_2.setFixedSize(300, 300)
-        # Corrige o erro de digitação no estilo do Wimget_2
-        Wimget_2.setStyleSheet(f"""
-            background-color: {UI_local.getColors()["black_second"]};
-            border-radius: 5px;
-            padding: 8px;
-        """)
-
-        # Layout horizontal só para os dois frames lado a lado
-        layout_horizontal_widgets = QHBoxLayout()
-        layout_horizontal_widgets.setSpacing(8)  # Espaçamento entre os dois frames
-        layout_horizontal_widgets.setContentsMargins(0, 0, 0, 0)
-        layout_horizontal_widgets.addWidget(Wimget_2)
-
-        #Add Wingets In Layout
-        main_layout.addWidget(top_bar,alignment=Qt.AlignLeft | Qt.AlignTop)
-        main_layout.addLayout(layout_horizontal_widgets,stretch=20)
-        main_layout.addWidget(upper_money, alignment=Qt.AlignLeft | Qt.AlignTop)
-        main_layout.addWidget(Wimget_2,alignment=Qt.AlignLeft | Qt.AlignTop)
-        main_layout.addStretch(stretch=20)
-        
-        # Windows Class
-        container = QWidget()
-        container.setLayout(main_layout)
-        self.setCentralWidget(container)
-        self.show()    
-        # app.quit()
 
 async def main() -> None:
-    if not data_local.Debug: asyncio.create_task(tool.verify_modules())
+    if not data_local.Debug:
+        asyncio.create_task(tool.verify_modules())
     asyncio.create_task(tool.add_path_modules(data_local))
-    await asyncio.create_task(user.set_values(data_local= data_local))
-    return
+    await asyncio.create_task(user.set_values(data_local=data_local))
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     asyncio.run(main())
-    Main()
+    window = Main(UI_local=UI_local,user=user,data_local=data_local)
+    sys.exit(app.exec())
