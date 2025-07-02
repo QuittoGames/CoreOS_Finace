@@ -17,10 +17,15 @@ class data:
     def getKey(self) -> str:
         try:
             path = os.path.join("data", ".env", "key.key")
-            if not os.path.exists(path):raise FileNotFoundError("File Not Exit")
-    
+            if not os.path.exists(path):raise FileNotFoundError("[ERROR] File Not Exit")
+
+            if not os.path.isfile(path):
+                if self.Debug:print(f"[WARN] Arquivo de chave não encontrado em: {path}")
+                return "" 
+        
             with open(path, "rb") as file:
                 self._key_json = file.read()
+                if self.Debug: print("[NOTIFY] Key retrieved successfully")
                 return self._key_json
         except FileNotFoundError as E:
-            raise FileNotFoundError ("File Not Found in path")
+            raise FileNotFoundError ("[ERROR] File Not Found in path")

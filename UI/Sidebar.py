@@ -1,122 +1,142 @@
-from data import data
-from tool import tool
-import asyncio
-import sys
 from PySide6.QtWidgets import *
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from decimal import Decimal
-from modules.User import User
+from PySide6.QtWidgets import QGraphicsOpacityEffect, QPushButton, QFrame, QVBoxLayout, QLabel, QSizePolicy
+from PySide6.QtGui import QFont
+from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QTimer
+
 from UI.UI import UI
-from time import sleep    
+
 
 class SideBar(QFrame):
-    def __init__(self, parent,UI_local:UI):
+    def __init__(self, parent, UI_local: UI):
         super().__init__(parent)
-        self.setFixedWidth(250)
+        self.UI_local = UI_local
+        self.expanded = True
+        self.animating = False
+
+        self.setMinimumWidth(60)
+        self.setMaximumWidth(260)
+        self.setObjectName("Sidebar")
         self.setStyleSheet(f"""
-            QFrame {{
+            QFrame#Sidebar {{
                 background-color: {UI_local.getColors()["black_third"]};
                 border: none;
-                border-radius: 5px;
             }}
             QPushButton {{
                 background-color: transparent;
                 color: white;
                 border: none;
                 padding: 12px 16px;
-                text-align: left;
                 font-size: 14px;
-                border-radius: 5px;
-                margin: 2px;
+                text-align: left;
+                border-radius: 6px;
             }}
             QPushButton:hover {{
-                background-color: rgba(255, 255, 255, 0.1);
+                background-color: rgba(255, 255, 255, 0.08);
             }}
             QPushButton:pressed {{
-                background-color: rgba(255, 255, 255, 0.2);
+                background-color: rgba(255, 255, 255, 0.12);
             }}
         """)
-        
         self.init_ui()
-        
-    def init_ui(self):
-        layout = QVBoxLayout(self)
-        layout.setSpacing(0)
-        layout.setContentsMargins(0, 0, 0, 0)
-        
-        # Logo área
-        logo_frame = QFrame()
-        logo_frame.setFixedHeight(60)
-        logo_layout = QHBoxLayout(logo_frame)
-        logo_layout.setContentsMargins(16, 12, 16, 12)
-        
-        # Logo placeholder (você pode substituir por uma imagem real)
-        logo_label = QLabel("") # Icon App
-        logo_label.setFixedSize(32, 32)
-        logo_label.setStyleSheet("font-size: 24px; color: #0655FF;")
-        logo_label.setAlignment(Qt.AlignCenter)
-        
-        app_name = QLabel("Core OS Finance")
-        app_name.setStyleSheet("""
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            transition: background 0.3s ease;
-        """)
-        app_name.setAttribute(Qt.WA_Hover)
 
-        # Para hover, você pode fazer assim:
-        app_name.setStyleSheet("""
-        QLabel {
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            padding: 4px 8px;
-            border-radius: 2px;
-        }
-        QLabel:hover {
-            background: qlineargradient(
-                x1: 0, y1: 1,
-                x2: 0, y2: 0,
-                stop: 0 rgba(6, 85, 255, 255),   /* azul totalmente opaco */
-                stop: 1 rgba(6, 85, 255, 0)      /* azul totalmente transparente */
-            );
-        }
-    """)
-        logo_layout.addWidget(logo_label)
-        logo_layout.addWidget(app_name)
-        logo_layout.addStretch()
-        
-        layout.addWidget(logo_frame)
-        
-        # Linha separadora
-        separator = QFrame()
-        separator.setFrameShape(QFrame.HLine)
-        separator.setStyleSheet("background-color: rgba(255, 255, 255, 0.1); height: 1px;")
-        layout.addWidget(separator)
-        
-        # Menu buttons
-        menu_frame = QFrame()
-        menu_layout = QVBoxLayout(menu_frame)
-        menu_layout.setContentsMargins(8, 16, 8, 16)
-        menu_layout.setSpacing(4)
-        
+    def init_ui(self):
+        self.layout = QVBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(0)
+
+        # Toggle button
+        self.toggle_btn = QPushButton("☰")
+        self.toggle_btn.setFixedHeight(40)
+        self.toggle_btn.setStyleSheet("font-size: 18px; color: white; padding: 8px 12px;")
+        self.toggle_btn.clicked.connect(self.toggle)
+        self.layout.addWidget(self.toggle_btn)
+
+        # Logo
+        self.logo = QLabel("Core OS")
+        self.logo.setAlignment(Qt.AlignCenter)
+        self.logo.setFont(QFont("Segoe UI", 18, QFont.Bold))
+        self.logo.setStyleSheet("color: white; padding: 20px;")
+        self.logo_opacity = QGraphicsOpacityEffect(self.logo)
+        self.logo.setGraphicsEffect(self.logo_opacity)
+        self.layout.addWidget(self.logo)
+
+        # Separator
+        sep = QFrame()
+        sep.setFrameShape(QFrame.HLine)
+        sep.setStyleSheet("background-color: rgba(255,255,255,0.1); height: 1px;")
+        self.layout.addWidget(sep)
+
         # Botões do menu
-        buttons = [
-            ("🏠", "Dashboard"),
-            ("💰", "Transações"),
-            ("📈", "Investimentos"),
-            ("📊", "Relatórios"),
-            ("⚙️", "Configurações")
+        self.menu_buttons = []
+        self.button_data = [
+            ("", "Dashboard"),
+            ("", "Transações"),
+            ("", "Investimentos"),
+            ("", "Relatórios"),
+            ("", "Configurações")
         ]
-        
-        for icon, text in buttons:
+        for icon, text in self.button_data:
             btn = QPushButton(f"{icon}  {text}")
-            btn.setFixedHeight(40)
-            menu_layout.addWidget(btn)
-        
-        layout.addWidget(menu_frame)
-        layout.addStretch()
+            btn.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
+            opacity = QGraphicsOpacityEffect(btn)
+            btn.setGraphicsEffect(opacity)
+
+            self.layout.addWidget(btn)
+            self.menu_buttons.append((btn, icon, text, opacity))
+
+        self.layout.addStretch()
+
+    def toggle(self):
+        if self.animating:
+            return
+        self.animating = True
+
+        # Largura alvo
+        target_width = 260 if not self.expanded else 60
+
+        # Animação de largura
+        self.anim = QPropertyAnimation(self, b"minimumWidth")
+        self.anim.setDuration(300)
+        self.anim.setStartValue(self.width())
+        self.anim.setEndValue(target_width)
+        self.anim.setEasingCurve(QEasingCurve.InOutCubic)
+        self.anim.start()
+
+        # Fade logo
+        logo_anim = QPropertyAnimation(self.logo_opacity, b"opacity")
+        logo_anim.setDuration(200)
+        logo_anim.setStartValue(1 if self.expanded else 0)
+        logo_anim.setEndValue(0 if self.expanded else 1)
+        logo_anim.start()
+
+        # Botões - fade + texto
+        for i, (btn, icon, text, effect) in enumerate(self.menu_buttons):
+            fade = QPropertyAnimation(effect, b"opacity")
+            fade.setDuration(200)
+            fade.setStartValue(1 if self.expanded else 0)
+            fade.setEndValue(0 if self.expanded else 1)
+            fade.setEasingCurve(QEasingCurve.InOutQuad)
+            fade.setStartDelay(i * 30)  # efeito encadeado
+            fade.start()
+
+        # Troca de texto dos botões após o fade out
+        QTimer.singleShot(200, self.update_button_texts)
+
+        # Finaliza a animação
+        QTimer.singleShot(350, lambda: setattr(self, "animating", False))
+        self.expanded = not self.expanded
+
+    def update_button_texts(self):
+        for btn, icon, text, effect in self.menu_buttons:
+            btn.setText(f"{icon}" if not self.expanded else f"{icon}  {text}")
+
+            # Fade-in após o texto ser trocado
+            fade_in = QPropertyAnimation(effect, b"opacity")
+            fade_in.setDuration(200)
+            fade_in.setStartValue(0)
+            fade_in.setEndValue(1)
+            fade_in.setEasingCurve(QEasingCurve.InOutQuad)
+            fade_in.start()
+
+        self.logo.setVisible(self.expanded)

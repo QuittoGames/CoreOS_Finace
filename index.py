@@ -9,6 +9,8 @@ from UI.UI import UI
 from time import sleep    
 from UI.Sidebar import SideBar
 from UI.MainContent import MainContent
+from PySide6.QtGui import QIcon
+import os
 
 data_local = data()
 user = User()
@@ -110,6 +112,7 @@ async def main() -> None:
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon(r"icons\CoreOSFinace_icon.png"))
     asyncio.run(main())
     window = Main(UI_local=UI_local,user=user,data_local=data_local)
     sys.exit(app.exec())
