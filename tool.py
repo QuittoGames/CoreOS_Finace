@@ -97,3 +97,48 @@ class tool:
         elif isinstance(value_local, dict):
             return {k: tool.decrypt_value(v, fernet) for k, v in value_local.items()}
         return value_local
+
+    def installer(data_local:data) -> bool:
+        install_path = os.path.join(os.getenv("APPDATA"), "CoreOS_Finace", "data") # Appdata Local App
+        data_json_path = os.path.join(install_path, "data.json")
+        key_path = os.path.join(install_path, ".env", "key.key")
+        try:
+            if not os.path.exists(install_path):
+                os.makedirs(install_path, exist_ok=True)
+                
+                if not os.path.exists(data_json_path) and not os.path.exists(key_path):
+                    #New Fernet Key
+                    new_fernet_key = Fernet.generate_key().strip().decode()
+                    fernet = Fernet(new_fernet_key)
+                    
+                    with open(key_path, "w") as key:
+                        key.write(new_fernet_key.decode())
+
+                    #New Json data File
+                    with open(install_path, "w") as file:
+                        file.write(data_local.json_formart)
+                        data_local.data_json_path = data_json_path
+                        tool.encrypt_value(data_local.data_json_path,data_local,fernet)
+
+                    os.makedirs(key_path,os.path.dirname(key_path) ,exist_ok=True)
+                    #Camanda de segurança para ter varias keys diferentes
+                return True
+        except ValueError as E:
+            raise ValueError(f"[ERROR] Path Not Fund, Path: {install_path}")
+        except PermissionError as E:
+            raise PermissionError("[SUDO] Sudo Warn")
+        return False
+    
+    def encrypt_value(value,data_local:data, fernet:Fernet):
+        if isinstance(value, (str, int, float)):
+            text = str(value)
+            enc = fernet.encrypt(text.encode())
+            return base64.urlsafe_b64encode(enc).decode()
+        elif isinstance(value, list):
+            return [tool.encrypt_value(v) for v in value]
+        elif isinstance(value, dict):
+            return {k: tool.encrypt_value(v) for k, v in value.items()}
+        else:
+            return value
+
+                

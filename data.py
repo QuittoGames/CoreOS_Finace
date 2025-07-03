@@ -10,15 +10,52 @@ class data:
     data_json_path = r"data\data.json"
     _key_json:str = ""
 
-    json_formart = """"""
+    json_formart = """
+{
+  "name": null,
+  "saldo": 0,
+  "aplicacoes": [
+    {
+      "name": null,
+      "taxa_juros": 0,
+      "type": null,
+      "moeda": null,
+      "min_aporte": 0,
+      "prazo_meses": 0,
+      "liquidez": null
+    }
+  ],
+  "receita": [
+    {
+      "id": null,
+      "name": null,
+      "descr": null,
+      "type": null,
+      "coin": null,
+      "value": 0
+    }
+  ],
+  "gastos": [
+    {
+      "id": null,
+      "name": null,
+      "descr": null,
+      "type": null,
+      "coin": null,
+      "value": 0
+    }
+  ]
+}
+"""
     
     #Getters
     #In Dev
     def getKey(self) -> str:
         try:
             path = os.path.join("data", ".env", "key.key")
-            if not os.path.exists(path):raise FileNotFoundError("[ERROR] File Not Exit")
-
+            if not os.path.exists(path):
+                path = os.path.join(os.getenv("APPDATA"), "CoreOS_Finace", "data") # Appdata Local App
+                  
             if not os.path.isfile(path):
                 if self.Debug:print(f"[WARN] Arquivo de chave não encontrado em: {path}")
                 return "" 

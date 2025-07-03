@@ -17,8 +17,8 @@ fernet = Fernet(key)
 
 # === JSON original ===
 dados = {
-    "name": "Quitto",
-    "saldo": 190.50,
+    "name": "Tester",
+    "saldo": 0,
     "aplicacoes": [
         {
             "name": "CDB Banco X",
@@ -37,7 +37,7 @@ dados = {
             "descr": "Recebimento mensal",
             "type": "Receita",
             "coin": "BRL",
-            "value": 5000
+            "value": 0
         }
     ],
     "gastos": [
@@ -47,7 +47,7 @@ dados = {
             "descr": "Despesa mensal",
             "type": "Gasto",
             "coin": "BRL",
-            "value": 105
+            "value": 0
         }
     ]
 }

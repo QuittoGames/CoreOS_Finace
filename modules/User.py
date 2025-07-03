@@ -24,6 +24,11 @@ class User:
     lucro: Decimal = (0.0)
     
     async def set_values(self,data_local: data):
+        try:
+            if tool.installer(data_local):
+                print("Instalaço Completa")
+        except PermissionError as E:
+            print(E)
         path = os.path.join(data.data_json_path)
         if not os.path.exists(path=path):tool.create_json(path)
         key = data_local.getKey()
