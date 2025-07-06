@@ -37,6 +37,7 @@ class SideBar(QFrame):
                 background-color: rgba(255, 255, 255, 0.12);
             }}
         """)
+        self.animations = []
         self.init_ui()
 
     def init_ui(self):
@@ -92,10 +93,8 @@ class SideBar(QFrame):
             return
         self.animating = True
 
-        # Largura alvo
         target_width = 260 if not self.expanded else 60
 
-        # Animação de largura
         self.anim = QPropertyAnimation(self, b"minimumWidth")
         self.anim.setDuration(300)
         self.anim.setStartValue(self.width())
@@ -103,40 +102,42 @@ class SideBar(QFrame):
         self.anim.setEasingCurve(QEasingCurve.InOutCubic)
         self.anim.start()
 
-        # Fade logo
         logo_anim = QPropertyAnimation(self.logo_opacity, b"opacity")
         logo_anim.setDuration(200)
         logo_anim.setStartValue(1 if self.expanded else 0)
         logo_anim.setEndValue(0 if self.expanded else 1)
         logo_anim.start()
 
-        # Botões - fade + texto
+        self.animations = []
         for i, (btn, icon, text, effect) in enumerate(self.menu_buttons):
-            fade = QPropertyAnimation(effect, b"opacity")
-            fade.setDuration(200)
-            fade.setStartValue(1 if self.expanded else 0)
-            fade.setEndValue(0 if self.expanded else 1)
-            fade.setEasingCurve(QEasingCurve.InOutQuad)
-            fade.setStartDelay(i * 30)  # efeito encadeado
-            fade.start()
+            delay = i * 50  # delay de 50ms entre cada fade para efeito cascata
+            QTimer.singleShot(delay, lambda e=effect, ex=self.expanded: self.start_fade_animation(e, ex))
 
-        # Troca de texto dos botões após o fade out
         QTimer.singleShot(200, self.update_button_texts)
+        QTimer.singleShot(700, lambda: setattr(self, "animating", False))
 
-        # Finaliza a animação
-        QTimer.singleShot(350, lambda: setattr(self, "animating", False))
         self.expanded = not self.expanded
+
+
+    def start_fade_animation(self, effect, expanded):
+        fade = QPropertyAnimation(effect, b"opacity")
+        fade.setDuration(200)
+        fade.setStartValue(1 if expanded else 0)
+        fade.setEndValue(0 if expanded else 1)
+        fade.setEasingCurve(QEasingCurve.InOutQuad)
+        fade.start()
+        self.animations.append(fade)
 
     def update_button_texts(self):
         for btn, icon, text, effect in self.menu_buttons:
             btn.setText(f"{icon}" if not self.expanded else f"{icon}  {text}")
 
-            # Fade-in após o texto ser trocado
             fade_in = QPropertyAnimation(effect, b"opacity")
             fade_in.setDuration(200)
             fade_in.setStartValue(0)
             fade_in.setEndValue(1)
             fade_in.setEasingCurve(QEasingCurve.InOutQuad)
             fade_in.start()
+            self.animations.append(fade_in)
 
         self.logo.setVisible(self.expanded)

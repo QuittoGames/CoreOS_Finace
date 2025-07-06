@@ -7,6 +7,7 @@ from data import data
 from random import randint
 from cryptography.fernet import Fernet
 import base64
+import json
 
 @dataclass
 class tool:
@@ -35,22 +36,8 @@ class tool:
         except Exception as E:
             print(f"Erro Al Adicionar Os Caminhos Brutos, Erro: {E}")
             return
-    
-    # In Dev
-    def create_json(path:str) -> None:
-        try:
-            os.makedirs("data",exist_ok=True)
-            data_json = os.path.join("data")
-            with open(data_json , "w") as file:
-                file.write(data.json_formart)
-        except PermissionError:
-            print("Erro: Sem permissão para criar arquivo ou pasta.")
-        except FileNotFoundError:
-            print("Erro: Pasta não encontrada.")
-        except OSError as e:
-            print(f"Erro do sistema: {e}")
-        return
-    
+        
+
     def menu(data_local:data,user):
         tool.clear_screen()   
         print("_"*30 + "Core OS Finace" + "_"*30)
@@ -100,36 +87,47 @@ class tool:
 
     def installer(data_local:data) -> bool:
         install_path = os.path.join(os.getenv("APPDATA"), "CoreOS_Finace", "data") # Appdata Local App
-        data_json_path = os.path.join(install_path, "data.json")
-        key_path = os.path.join(install_path, ".env", "key.key")
+        key_path = os.path.join(install_path, ".env","key.key")
+        if data_local.Debug:print(f"[WARN] Key path exit: {os.path.exists(key_path)}")
+        #New Fernet Key
+        #Camanda de segurança para ter varias keys diferentes
+        new_fernet_key = Fernet.generate_key()
+
+        if len(new_fernet_key) != 44: 
+            print(f"[ERROR] Key inválida, tamanho esperado 44 bytes, mas tem {len(key)}, Type: {type(new_fernet_key)}")
+            return False
+        fernet = Fernet(new_fernet_key) # The fernet clas cant is created in try 
+    
         try:
             if not os.path.exists(install_path):
                 os.makedirs(install_path, exist_ok=True)
                 
-                if not os.path.exists(data_json_path) and not os.path.exists(key_path):
-                    #New Fernet Key
-                    new_fernet_key = Fernet.generate_key().strip().decode()
-                    fernet = Fernet(new_fernet_key)
-                    
-                    with open(key_path, "w") as key:
-                        key.write(new_fernet_key.decode())
+            if not os.path.exists(data_local.data_json_path) or not os.path.exists(key_path):
 
-                    #New Json data File
-                    with open(install_path, "w") as file:
-                        file.write(data_local.json_formart)
-                        data_local.data_json_path = data_json_path
-                        tool.encrypt_value(data_local.data_json_path,data_local,fernet)
+                os.makedirs(os.path.dirname(key_path), exist_ok=True)
+                
+                with open(key_path, "wb") as key:
+                    key.write(new_fernet_key)
 
-                    os.makedirs(key_path,os.path.dirname(key_path) ,exist_ok=True)
-                    #Camanda de segurança para ter varias keys diferentes
-                return True
+                # encrypt_json = fernet.encrypt(data_local.json_formart.encode())
+                data_local.verifyDiretoryPathJson()
+                data_local.data_json_path = install_path
+                local_json = data_local.create_json(path=str(install_path))
+                encrypt_json = tool.encrypt_value(value=local_json,fernet=fernet)
+
+                if data_local.Debug:print(f"[WARN] Type Of Local Json: {type(encrypt_json)}")
+                
+                #New Json data File
+                with open(data_local.data_json_path, "w", encoding="utf-8") as file:
+                    file.write(json.dumps(encrypt_json, indent=4))
+
+            return True
         except ValueError as E:
             raise ValueError(f"[ERROR] Path Not Fund, Path: {install_path}")
         except PermissionError as E:
             raise PermissionError("[SUDO] Sudo Warn")
-        return False
-    
-    def encrypt_value(value,data_local:data, fernet:Fernet):
+        
+    def encrypt_value(value,fernet:Fernet):
         if isinstance(value, (str, int, float)):
             text = str(value)
             enc = fernet.encrypt(text.encode())
@@ -140,5 +138,3 @@ class tool:
             return {k: tool.encrypt_value(v) for k, v in value.items()}
         else:
             return value
-
-                

@@ -74,24 +74,6 @@ class Main(QMainWindow):
         
         layout = QHBoxLayout(header)
         layout.setContentsMargins(20, 0, 20, 0)
-        
-        toggle_btn = QPushButton("☰")
-        toggle_btn.setFixedSize(40, 40)
-        toggle_btn.setStyleSheet("""
-            QPushButton {
-                background-color: transparent;
-                color: white;
-                border: none;
-                font-size: 18px;
-                border-radius: 5px;
-            }
-            QPushButton:hover {
-                background-color: rgba(255, 255, 255, 0.1);
-            }
-        """)
-        toggle_btn.clicked.connect(self.toggle_sidebar)
-        
-        layout.addWidget(toggle_btn)
         layout.addStretch()
         
         return header
@@ -111,7 +93,7 @@ async def main() -> None:
     await asyncio.create_task(user.set_values(data_local=data_local))
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
+    app = QApplication(sys.argv)    
     app.setWindowIcon(QIcon(r"icons\CoreOSFinace_icon.png"))
     asyncio.run(main())
     window = Main(UI_local=UI_local,user=user,data_local=data_local)

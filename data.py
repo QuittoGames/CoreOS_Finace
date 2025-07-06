@@ -50,7 +50,7 @@ class data:
     
     #Getters
     #In Dev
-    def getKey(self) -> str:
+    def getKey(self) -> bytes:
         try:
             path = os.path.join("data", ".env", "key.key")
             if not os.path.exists(path):
@@ -59,10 +59,42 @@ class data:
             if not os.path.isfile(path):
                 if self.Debug:print(f"[WARN] Arquivo de chave não encontrado em: {path}")
                 return "" 
-        
+            
             with open(path, "rb") as file:
                 self._key_json = file.read()
                 if self.Debug: print("[NOTIFY] Key retrieved successfully")
+                if len(self._key_json) != 44: 
+                      print(f"[ERROR] Key inválida, tamanho esperado 44 bytes, mas tem {len(self._key_json)}")
+
                 return self._key_json
         except FileNotFoundError as E:
             raise FileNotFoundError ("[ERROR] File Not Found in path")
+        except PermissionError as E:
+            raise PermissionError(["[SUDO] Permission Error"])
+        
+    @classmethod
+    def verifyDiretoryPathJson(cls) -> None:
+        try:
+            appdata_path = os.path.join(os.getenv("APPDATA"), "CoreOS_Finace", "data", "data.json")
+            if os.path.exists(appdata_path):
+                cls.data_json_path = appdata_path
+            
+            local_path = os.path.join(os.getcwd(), "data", "data.json")
+            cls.data_json_path = local_path
+        except PermissionError:
+            raise PermissionError("[SUDO] Permission Error")
+        except FileNotFoundError:
+            raise FileNotFoundError("[ERROR] File Not Fond")
+
+    def create_json(self,path:str) -> None:
+        path = os.path.join(path)
+        try:
+            os.makedirs(os.path.dirname(self.data_json_path), exist_ok=True)
+            with open(path, "w", encoding="utf-8") as file:
+                file.write(self.json_formart)
+        except PermissionError:
+            print("Erro: Sem permissão para criar arquivo ou pasta.")
+        except FileNotFoundError:
+            print("Erro: Caminho não encontrado.")
+        except OSError as e:
+            print(f"Erro do sistema: {e}")

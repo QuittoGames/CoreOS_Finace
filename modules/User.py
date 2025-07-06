@@ -26,17 +26,19 @@ class User:
     async def set_values(self,data_local: data):
         try:
             if tool.installer(data_local):
-                print("Instalaço Completa")
+                print("[WARN] Instalaço Completa")
         except PermissionError as E:
             print(E)
+
+        # if not os.path.exists(path=path):tool.create_json(path) devido al novo sistema de instalçao esta obsoleto entretanto vol manter a func para caso de nessisadade
         path = os.path.join(data.data_json_path)
-        if not os.path.exists(path=path):tool.create_json(path)
         key = data_local.getKey()
+        if isinstance(key, str):key = key.encode() 
         fernet = Fernet(key=key)
 
-        with open(data.data_json_path, "r+") as file:
+        with open(data.data_json_path, "rb") as file:
             data.json_data = json.loads(file.read())
-            if data_local.Debug: print("DEBUG saldo:", data_local.json_data.get("saldo"),type(data.json_data.get("saldo")))
+            # if data_local.Debug: print("DEBUG saldo:", data_local.json_data.get("saldo"),type(data.json_data.get("saldo")))
             data.json_data = tool.decrypt_value(value_local=data.json_data, fernet=fernet)     # ← CONVERTE de string JSON para dict
 
         self.saldo = Decimal(str(data.json_data["saldo"]))
