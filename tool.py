@@ -111,7 +111,7 @@ class tool:
 
                 # encrypt_json = fernet.encrypt(data_local.json_formart.encode())
                 data_local.verifyDiretoryPathJson()
-                data_local.data_json_path = install_path
+                data_local.data_json_path = os.path.join(install_path, "data.json")
                 local_json = data_local.create_json(path=str(install_path))
                 encrypt_json = tool.encrypt_value(value=local_json,fernet=fernet)
 
@@ -127,14 +127,13 @@ class tool:
         except PermissionError as E:
             raise PermissionError("[SUDO] Sudo Warn")
         
-    def encrypt_value(value,fernet:Fernet):
+    def encrypt_value(value, fernet: Fernet):
         if isinstance(value, (str, int, float)):
             text = str(value)
             enc = fernet.encrypt(text.encode())
             return base64.urlsafe_b64encode(enc).decode()
         elif isinstance(value, list):
-            return [tool.encrypt_value(v) for v in value]
+            return [tool.encrypt_value(v, fernet) for v in value]
         elif isinstance(value, dict):
-            return {k: tool.encrypt_value(v) for k, v in value.items()}
-        else:
+            return {k: tool.encrypt_value(v, fernet) for k, v in value.items()}
             return value

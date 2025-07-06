@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 import os
+import json
 
 @dataclass
 class data:
@@ -72,26 +73,33 @@ class data:
         except PermissionError as E:
             raise PermissionError(["[SUDO] Permission Error"])
         
+
+    
+    """Verifica se o arquivo data.json existe na pasta local; 
+    se existir, define o caminho local como padrão, 
+    senão usa o caminho na pasta APPDATA do sistema.
+    Trata erros de permissão e arquivo não encontrado."""
     @classmethod
     def verifyDiretoryPathJson(cls) -> None:
         try:
             appdata_path = os.path.join(os.getenv("APPDATA"), "CoreOS_Finace", "data", "data.json")
-            if os.path.exists(appdata_path):
-                cls.data_json_path = appdata_path
-            
             local_path = os.path.join(os.getcwd(), "data", "data.json")
-            cls.data_json_path = local_path
+            if os.path.exists(local_path):
+                cls.data_json_path = local_path
+            else:
+                cls.data_json_path = appdata_path
         except PermissionError:
             raise PermissionError("[SUDO] Permission Error")
         except FileNotFoundError:
             raise FileNotFoundError("[ERROR] File Not Fond")
 
     def create_json(self,path:str) -> None:
-        path = os.path.join(path)
+        path = os.path.join(path,"data.json")
         try:
             os.makedirs(os.path.dirname(self.data_json_path), exist_ok=True)
             with open(path, "w", encoding="utf-8") as file:
                 file.write(self.json_formart)
+            return json.loads(self.json_formart)
         except PermissionError:
             print("Erro: Sem permissão para criar arquivo ou pasta.")
         except FileNotFoundError:
