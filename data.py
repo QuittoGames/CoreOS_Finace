@@ -1,6 +1,9 @@
 from dataclasses import dataclass, field
 import os
 import json
+import base64
+from cryptography.fernet import Fernet
+
 
 @dataclass
 class data:
@@ -9,6 +12,7 @@ class data:
     Debug:bool = True
     show_saldo: bool = False
     data_json_path = r"data\data.json"
+    path_local:str = ""
     _key_json:str = ""
 
     json_formart = """
@@ -53,9 +57,7 @@ class data:
     #In Dev
     def getKey(self) -> bytes:
         try:
-            path = os.path.join("data", ".env", "key.key")
-            if not os.path.exists(path):
-                path = os.path.join(os.getenv("APPDATA"), "CoreOS_Finace", "data") # Appdata Local App
+            path = os.path.join(self.path_local,".env","key.key")
                   
             if not os.path.isfile(path):
                 if self.Debug:print(f"[WARN] Arquivo de chave não encontrado em: {path}")
@@ -79,19 +81,22 @@ class data:
     se existir, define o caminho local como padrão, 
     senão usa o caminho na pasta APPDATA do sistema.
     Trata erros de permissão e arquivo não encontrado."""
-    @classmethod
-    def verifyDiretoryPathJson(cls) -> None:
+    def setEnvPath(self) -> str:
         try:
-            appdata_path = os.path.join(os.getenv("APPDATA"), "CoreOS_Finace", "data", "data.json")
-            local_path = os.path.join(os.getcwd(), "data", "data.json")
+            appdata_path = os.path.join(os.getenv("APPDATA"), "CoreOS_Finace", "data")
+            local_path = os.path.join(os.getcwd(), "data")
+            
             if os.path.exists(local_path):
-                cls.data_json_path = local_path
-            else:
-                cls.data_json_path = appdata_path
+                self.path_local = local_path
+            elif os.path.exists(appdata_path):
+                self.path_local = appdata_path
+
+            return self.path_local
         except PermissionError:
             raise PermissionError("[SUDO] Permission Error")
         except FileNotFoundError:
             raise FileNotFoundError("[ERROR] File Not Fond")
+
 
     def create_json(self,path:str) -> None:
         path = os.path.join(path,"data.json")
@@ -106,3 +111,12 @@ class data:
             print("Erro: Caminho não encontrado.")
         except OSError as e:
             print(f"Erro do sistema: {e}")
+
+    def save_json(self, fernet: Fernet) -> None:
+        """
+        Salva o json_data criptografado em data_json_path.
+        """
+        payload = json.dumps(self.json_data, indent=4).encode()
+        encrypted = fernet.encrypt(payload)
+        with open(self.data_json_path, "wb") as f:
+            f.write(encrypted)

@@ -92,9 +92,11 @@ async def main() -> None:
     asyncio.create_task(tool.add_path_modules(data_local))
     await asyncio.create_task(user.set_values(data_local=data_local))
 
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)    
     app.setWindowIcon(QIcon(r"icons\CoreOSFinace_icon.png"))
     asyncio.run(main())
+    user.setNameGUI(data_local) # Verfica via func direta (funçao que exec açao de modo imperativo) o name e pede para setalo
     window = Main(UI_local=UI_local,user=user,data_local=data_local)
     sys.exit(app.exec())

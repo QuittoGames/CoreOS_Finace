@@ -64,7 +64,7 @@ class tool:
                 high = mid - 1 
 
         return None
-
+    
     def decrypt_value(value_local, fernet: Fernet) -> dict:
         if isinstance(value_local, str):
             try:
@@ -109,8 +109,6 @@ class tool:
                 with open(key_path, "wb") as key:
                     key.write(new_fernet_key)
 
-                # encrypt_json = fernet.encrypt(data_local.json_formart.encode())
-                data_local.verifyDiretoryPathJson()
                 data_local.data_json_path = os.path.join(install_path, "data.json")
                 local_json = data_local.create_json(path=str(install_path))
                 encrypt_json = tool.encrypt_value(value=local_json,fernet=fernet)
@@ -137,3 +135,4 @@ class tool:
         elif isinstance(value, dict):
             return {k: tool.encrypt_value(v, fernet) for k, v in value.items()}
             return value
+    

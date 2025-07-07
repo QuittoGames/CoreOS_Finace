@@ -11,6 +11,8 @@ from modules.Aplicao import Aplicao
 from modules.Item import Item
 from cryptography.fernet import Fernet
 from modules.Item import Item   
+from UI.Setname import NameDialog
+from PySide6.QtWidgets import QDialog
 import json
 
 @dataclass
@@ -30,19 +32,20 @@ class User:
         except PermissionError as E:
             print(E)
 
-        # if not os.path.exists(path=path):tool.create_json(path) devido al novo sistema de instalçao esta obsoleto entretanto vol manter a func para caso de nessisadade
-        path = os.path.join(data.data_json_path)
-        key = data_local.getKey()
+        local_path = data_local.setEnvPath() #Adiciona o valor do path local
+        data_local.data_json_path = os.path.join(local_path,"data.json")
+        
+        key = data_local.getKey() 
         if isinstance(key, str):key = key.encode() 
         fernet = Fernet(key=key)
 
-        with open(data.data_json_path, "rb") as file:
-            data.json_data = json.loads(file.read())
+        with open(data_local.data_json_path, "rb") as file:
+            data_local.json_data = json.loads(file.read())
             # if data_local.Debug: print("DEBUG saldo:", data_local.json_data.get("saldo"),type(data.json_data.get("saldo")))
-            data.json_data = tool.decrypt_value(value_local=data.json_data, fernet=fernet)     # ← CONVERTE de string JSON para dict
+            data_local.json_data = tool.decrypt_value(value_local=data_local.json_data, fernet=fernet)     # ← CONVERTE de string JSON para dict
 
-        self.saldo = Decimal(str(data.json_data["saldo"]))
-        self.name = str(data.json_data["name"])
+        self.saldo = Decimal(str(data_local.json_data["saldo"]))
+        self.name = str(data_local.json_data["name"])
         #For in Json
         self.aplicaçoes = [Aplicao(
             _name=ap["name"],
@@ -52,25 +55,25 @@ class User:
             _min_aporte=Decimal(str(ap["min_aporte"])),
             _prazo_meses=ap["prazo_meses"],
             _liquidez=ap["liquidez"],
-        )for ap in data.json_data["aplicacoes"]]
+        )for ap in data_local.json_data["aplicacoes"]]
 
         self.gastos = [Item(
-            _ID = Item.generete_nunber(),
+            _ID = Item.generete_nunber(data_local=data_local),
             _name = ap["name"],
             _descr = ap["descr"],
             _type = ap["type"],
             _coin = ap["coin"],
             _value = ap["value"],
-        ) for ap in data.json_data["gastos"]]
+        ) for ap in data_local.json_data["gastos"]]
 
         self.receita = [Item(
-            _ID = Item.generete_nunber(),
+            _ID = Item.generete_nunber(data_local=data_local),
             _name = ap["name"],
             _descr = ap["descr"],
             _type = ap["type"],
             _coin = ap["coin"],
             _value = ap["value"],
-        ) for ap in data.json_data["receita"]]
+        ) for ap in data_local.json_data["receita"]]
 
         self.extrato = self.receita + self.gastos
     
@@ -88,3 +91,13 @@ class User:
         else:
             self.gastos.append(Item)
         self.extrato.append(Item)
+
+    def setNameGUI(self,data_local:data):
+        try:
+            if str(self.name).strip().lower() in ("", "none"):
+                dialog = NameDialog()
+                if dialog.exec() == QDialog.Accepted:
+                    self.name = dialog.getName()
+                    data_local.json_data["name"] = self.name
+        except Exception as E:
+            print(f"Erro Al inicar Login GUI, Erro: {E}")
