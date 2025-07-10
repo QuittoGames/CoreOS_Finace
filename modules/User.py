@@ -19,7 +19,7 @@ import json
 class User:
     saldo:Decimal = (0.0)
     name:str = ""
-    aplicaçoes: list = field(default_factory=list)
+    aplicacoes: list = field(default_factory=list)
     receita: list = field(default_factory=list)
     gastos: list = field(default_factory=list)
     extrato: list = field(default_factory=list)
@@ -47,7 +47,7 @@ class User:
         self.saldo = Decimal(str(data_local.json_data["saldo"]))
         self.name = str(data_local.json_data["name"])
         #For in Json
-        self.aplicaçoes = [Aplicao(
+        self.aplicacoes = [Aplicao(
             _name=ap["name"],
             _taxa_juros=ap["taxa_juros"],
             _type=ap["type"],
@@ -98,6 +98,24 @@ class User:
                 dialog = NameDialog()
                 if dialog.exec() == QDialog.Accepted:
                     self.name = dialog.getName()
-                    data_local.json_data["name"] = self.name
+                    # self.name = data_local.json_data["name"]
         except Exception as E:
             print(f"Erro Al inicar Login GUI, Erro: {E}")
+
+    #Fix
+    def saveUserInJson(self,data_local:data) -> None:
+        try:
+            atrr = [i for i in dir(self) if i in ("lucro")] #Adicionar mais intem a tupla caso os ignoradaos atributos alemtem 
+
+            for i in atrr:
+                value = getattr(self, i)
+                if isinstance(data_local.json_data.get(i), type(value)) or data_local.json_data.get(i) is None: #Verify Type || get element in json
+                    data_local.json_data[i] = value
+                elif data_local.Debug:
+                    print(f"[WARN] Atributo '{i}' ignorado — tipo incompatível.")
+
+            if data_local.Debug: print(f"[DEBUG] Json Name: {data_local.json_data["name"]}")
+        except IndexError as E:
+            raise IndexError("Index out of range\n[FUNCTION]: tool.saveUserJson()")
+        except Exception as E:
+            raise Exception(f"Nao foi possivel passar os dados parao json local, Erro: {E}")

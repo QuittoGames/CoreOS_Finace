@@ -8,6 +8,8 @@ from random import randint
 from cryptography.fernet import Fernet
 import base64
 import json
+import signal
+import asyncio
 
 @dataclass
 class tool:
@@ -48,6 +50,7 @@ class tool:
         print("2. Config")
         print("3. Exit")
 
+    @staticmethod
     def binary_search(array: list, target: int) -> int:
         low = 0
         high = len(array) - 1
@@ -65,6 +68,7 @@ class tool:
 
         return None
     
+    @staticmethod
     def decrypt_value(value_local, fernet: Fernet) -> dict:
         if isinstance(value_local, str):
             try:
@@ -85,6 +89,7 @@ class tool:
             return {k: tool.decrypt_value(v, fernet) for k, v in value_local.items()}
         return value_local
 
+    @staticmethod
     def installer(data_local:data) -> bool:
         install_path = os.path.join(os.getenv("APPDATA"), "CoreOS_Finace", "data") # Appdata Local App
         key_path = os.path.join(install_path, ".env","key.key")
@@ -124,7 +129,8 @@ class tool:
             raise ValueError(f"[ERROR] Path Not Fund, Path: {install_path}")
         except PermissionError as E:
             raise PermissionError("[SUDO] Sudo Warn")
-        
+    
+    @staticmethod
     def encrypt_value(value, fernet: Fernet):
         if isinstance(value, (str, int, float)):
             text = str(value)
@@ -135,4 +141,29 @@ class tool:
         elif isinstance(value, dict):
             return {k: tool.encrypt_value(v, fernet) for k, v in value.items()}
             return value
+        
+    @staticmethod
+    def save_json(data_local:data, fernet: Fernet) -> None:
+        try:
+
+            """
+            Salva o json_data criptografado em data_json_path.
+            """
+            encrypt_json = tool.encrypt_value(data_local.json_data, fernet)
+
+            # Grava no arquivo sobrescrevendo tudo
+            with open(data_local.data_json_path, "w", encoding="utf-8") as file:
+                json.dump(encrypt_json, file, indent=4, ensure_ascii=False)
+
+            if data_local.Debug:
+                print("[DEBUG] JSON salvo com criptografia com sucesso.")
+        except PermissionError as E:
+            raise PermissionError("[SUDO] Sudo Permision ")
+        except Exception as E:
+            raise Exception(f"[ERROR] JSON data can't be saved, Error: {E}")
     
+    #CLI Exit control
+    def exit_signal(loop,data_local:data):
+        key = data_local.getFernet()
+        for singal in (signal.SIGINT, signal.SIGTERM):
+            loop.add_signal_handler(singal, lambda: asyncio.create_task((tool.save_json(data_local,key))))

@@ -75,7 +75,8 @@ class data:
         except PermissionError as E:
             raise PermissionError(["[SUDO] Permission Error"])
         
-
+    def getFernet(self) -> str:
+        return self._key_json
     
     """Verifica se o arquivo data.json existe na pasta local; 
     se existir, define o caminho local como padrão, 
@@ -112,11 +113,4 @@ class data:
         except OSError as e:
             print(f"Erro do sistema: {e}")
 
-    def save_json(self, fernet: Fernet) -> None:
-        """
-        Salva o json_data criptografado em data_json_path.
-        """
-        payload = json.dumps(self.json_data, indent=4).encode()
-        encrypted = fernet.encrypt(payload)
-        with open(self.data_json_path, "wb") as f:
-            f.write(encrypted)
+
