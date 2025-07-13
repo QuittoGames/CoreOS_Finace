@@ -24,7 +24,19 @@ class User:
     gastos: list = field(default_factory=list)
     extrato: list = field(default_factory=list)
     lucro: Decimal = (0.0)
-    
+
+    #Const
+    NOT_ATTR_JSON :tuple = (
+            "__class__", "__dict__", "__doc__", "__module__", "__weakref__",
+            "__annotations__", "__dataclass_fields__", "__dataclass_params__",
+            "__init__", "__str__", "__repr__", "__eq__", "__ne__", "__lt__", "__le__",
+            "__gt__", "__ge__", "__format__", "__getattribute__", "__setattr__",
+            "__delattr__", "__init_subclass__", "__new__", "__reduce__", "__reduce_ex__",
+            "__sizeof__", "__subclasshook__", "__match_args__", "__getstate__",
+            "__replace__", "__dir__", "addItem", "saveUserInJson", "set_values",
+            "setNameGUI", "getSaldo","lucro","NOT_ATTR_JSON", "__hash__","__static_attributes__","__firstlineno__"
+        )
+
     async def set_values(self,data_local: data):
         try:
             if tool.installer(data_local):
@@ -39,23 +51,27 @@ class User:
         if isinstance(key, str):key = key.encode() 
         fernet = Fernet(key=key)
 
-        with open(data_local.data_json_path, "rb") as file:
-            data_local.json_data = json.loads(file.read())
-            # if data_local.Debug: print("DEBUG saldo:", data_local.json_data.get("saldo"),type(data.json_data.get("saldo")))
-            data_local.json_data = tool.decrypt_value(value_local=data_local.json_data, fernet=fernet)     # ← CONVERTE de string JSON para dict
+        #Open File Json
+        tool.openJson(data_local,fernet)
 
-        self.saldo = Decimal(str(data_local.json_data["saldo"]))
+        if data_local.json_data["saldo"] is None or str(data_local.json_data["saldo"]).strip() == "":
+            if data_local.Debug:print("[WARN] Saldo inválido no JSON, usando 0.0")
+            self.saldo = Decimal("0.0")
+        else:
+            self.saldo = Decimal(str(data_local.json_data["saldo"]))
+
         self.name = str(data_local.json_data["name"])
         #For in Json
+        #Refactor for mutiple funcs
         self.aplicacoes = [Aplicao(
-            _name=ap["name"],
+            _name=str(ap["name"]),
             _taxa_juros=ap["taxa_juros"],
             _type=ap["type"],
             _moeda=ap["moeda"],
             _min_aporte=Decimal(str(ap["min_aporte"])),
             _prazo_meses=ap["prazo_meses"],
             _liquidez=ap["liquidez"],
-        )for ap in data_local.json_data["aplicacoes"]]
+        )for ap in data_local.json_data["aplicacoes"]if ap is not None] 
 
         self.gastos = [Item(
             _ID = Item.generete_nunber(data_local=data_local),
@@ -64,7 +80,7 @@ class User:
             _type = ap["type"],
             _coin = ap["coin"],
             _value = ap["value"],
-        ) for ap in data_local.json_data["gastos"]]
+        ) for ap in data_local.json_data["gastos"]if ap is not None]
 
         self.receita = [Item(
             _ID = Item.generete_nunber(data_local=data_local),
@@ -73,7 +89,7 @@ class User:
             _type = ap["type"],
             _coin = ap["coin"],
             _value = ap["value"],
-        ) for ap in data_local.json_data["receita"]]
+        ) for ap in data_local.json_data["receita"] if ap is not None]
 
         self.extrato = self.receita + self.gastos
     
@@ -94,7 +110,7 @@ class User:
 
     def setNameGUI(self,data_local:data):
         try:
-            if str(self.name).strip().lower() in ("", "none"):
+            if (str(data_local.json_data["name"]).strip().lower()) in ("", "none"):
                 dialog = NameDialog()
                 if dialog.exec() == QDialog.Accepted:
                     self.name = dialog.getName()
@@ -105,14 +121,11 @@ class User:
     #Fix
     def saveUserInJson(self,data_local:data) -> None:
         try:
-            atrr = [i for i in dir(self) if i in ("lucro")] #Adicionar mais intem a tupla caso os ignoradaos atributos alemtem 
+            atrr = [i for i in dir(self) if i not in self.NOT_ATTR_JSON]
 
             for i in atrr:
                 value = getattr(self, i)
-                if isinstance(data_local.json_data.get(i), type(value)) or data_local.json_data.get(i) is None: #Verify Type || get element in json
-                    data_local.json_data[i] = value
-                elif data_local.Debug:
-                    print(f"[WARN] Atributo '{i}' ignorado — tipo incompatível.")
+                data_local.json_data[i] = value
 
             if data_local.Debug: print(f"[DEBUG] Json Name: {data_local.json_data["name"]}")
         except IndexError as E:

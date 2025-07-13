@@ -91,8 +91,8 @@ class Main(QMainWindow):
         try:
             key = data_local.getFernet()
             key = Fernet(key)
-            tool.save_json(data_local,key)
             user.saveUserInJson(data_local)
+            tool.save_json(data_local,key)
             if data_local.Debug: 
                 print("[DEBUG] save_json executado")
                 print(f"[DEBUG] Salvando arquivo em: {data_local.data_json_path}")
@@ -110,9 +110,9 @@ async def main() -> None:
         # tool.exit_signal(loop , data_local) #CLI Exit control
     except PermissionError as E:
         print(E) # The raise return str
-    except Exception as E:
-        print(E)
-
+        sleep(5)
+        tool.rebootApp()
+        
 if __name__ == "__main__":
     app = QApplication(sys.argv)    
     app.setWindowIcon(QIcon(r"icons\CoreOSFinace_icon.png"))

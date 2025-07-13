@@ -108,21 +108,21 @@ class tool:
                 os.makedirs(install_path, exist_ok=True)
                 
             if not os.path.exists(data_local.data_json_path) or not os.path.exists(key_path):
-
                 os.makedirs(os.path.dirname(key_path), exist_ok=True)
                 
                 with open(key_path, "wb") as key:
                     key.write(new_fernet_key)
 
                 data_local.data_json_path = os.path.join(install_path, "data.json")
-                local_json = data_local.create_json(path=str(install_path))
-                encrypt_json = tool.encrypt_value(value=local_json,fernet=fernet)
+                if not os.path.exists(data_local.data_json_path):
+                    local_json = data_local.create_json(path=str(install_path))
+                    encrypt_json = tool.encrypt_value(value=local_json,fernet=fernet)
 
-                if data_local.Debug:print(f"[WARN] Type Of Local Json: {type(encrypt_json)}")
-                
-                #New Json data File
-                with open(data_local.data_json_path, "w", encoding="utf-8") as file:
-                    file.write(json.dumps(encrypt_json, indent=4))
+                    if data_local.Debug:print(f"[WARN] Type Of Local Json: {type(encrypt_json)}")
+                    
+                    #New Json data File
+                    with open(data_local.data_json_path, "w", encoding="utf-8") as file:
+                        file.write(json.dumps(encrypt_json, indent=4))
 
             return True
         except ValueError as E:
@@ -167,3 +167,22 @@ class tool:
         key = data_local.getFernet()
         for singal in (signal.SIGINT, signal.SIGTERM):
             loop.add_signal_handler(singal, lambda: asyncio.create_task((tool.save_json(data_local,key))))
+
+    def openJson(data_local:data,fernet:Fernet) -> None:
+        try:
+            with open(data_local.data_json_path, "rb") as file:
+                data_local.json_data = json.loads(file.read())
+                data_local.json_data = tool.decrypt_value(value_local=data_local.json_data, fernet=fernet)     # ← CONVERTE de string JSON para dict
+        except PermissionError as E:
+            raise PermissionError("[SUDO] Sudo Permision")
+        except Exception as E:
+            raise Exception("[ERROR] Error with open json file")
+        
+    def rebootApp() -> None:
+        try:
+            subprocess.run([sys.executable, "index.py"])
+        except PermissionError as E:
+            raise PermissionError("[SUDO] udo Permision")
+        except Exception as E:
+            raise Exception("[ERROR] Error with open json file")
+        
