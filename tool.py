@@ -129,18 +129,27 @@ class tool:
             raise ValueError(f"[ERROR] Path Not Fund, Path: {install_path}")
         except PermissionError as E:
             raise PermissionError("[SUDO] Sudo Warn")
+        
+    def is_encrypted(value: str) -> bool:
+        try:
+            # Tenta decodificar como base64 e ver se é um token válido do Fernet
+            base64.urlsafe_b64decode(value.encode())
+            return value.endswith("==") and len(value) > 100
+        except Exception:
+            return False
     
     @staticmethod
     def encrypt_value(value, fernet: Fernet):
         if isinstance(value, (str, int, float)):
             text = str(value)
+            if isinstance(value, str) and tool.is_encrypted(value):
+                return value  # Já está criptografado
             enc = fernet.encrypt(text.encode())
             return base64.urlsafe_b64encode(enc).decode()
         elif isinstance(value, list):
             return [tool.encrypt_value(v, fernet) for v in value]
         elif isinstance(value, dict):
             return {k: tool.encrypt_value(v, fernet) for k, v in value.items()}
-            return value
         
     @staticmethod
     def save_json(data_local:data, fernet: Fernet) -> None:
@@ -173,11 +182,21 @@ class tool:
             with open(data_local.data_json_path, "rb") as file:
                 data_local.json_data = json.loads(file.read())
                 data_local.json_data = tool.decrypt_value(value_local=data_local.json_data, fernet=fernet)     # ← CONVERTE de string JSON para dict
+                tool.clearJson(data_local) #Limpa o json para possibilitar a escrita das novas infos
         except PermissionError as E:
             raise PermissionError("[SUDO] Sudo Permision")
         except Exception as E:
             raise Exception("[ERROR] Error with open json file")
-        
+    
+    def clearJson(data_local:data):
+        try:
+            with open(data_local.data_json_path, "w", encoding="utf-8") as file:
+                json.dump(data_local.json_formart,file,ensure_ascii=False, indent=4) # ensure_ascii=False permite salvar caracteres Unicode (como acentos) direto no arquivo, sem escapar para \uXXXX
+        except PermissionError as E:
+            raise PermissionError("[SUDO] Sudo Permision")
+        except Exception as E:
+            raise Exception("[ERROR] Error with open json file")
+    
     def rebootApp() -> None:
         try:
             subprocess.run([sys.executable, "index.py"])
