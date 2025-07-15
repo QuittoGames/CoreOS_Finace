@@ -10,6 +10,7 @@ import base64
 import json
 import signal
 import asyncio
+from modules.Cripitografy import Critografy
 
 @dataclass
 class tool:
@@ -69,27 +70,6 @@ class tool:
         return None
     
     @staticmethod
-    def decrypt_value(value_local, fernet: Fernet) -> dict:
-        if isinstance(value_local, str):
-            try:
-                enc_bytes = base64.urlsafe_b64decode(value_local.encode())
-                dec = fernet.decrypt(enc_bytes).decode()
-                # Tenta converter pra número, se possível
-                if dec.isdigit():
-                    return int(dec)
-                try:
-                    return float(dec)
-                except:
-                    return dec
-            except Exception:
-                return value_local
-        elif isinstance(value_local, list):
-            return [tool.decrypt_value(v, fernet) for v in value_local]
-        elif isinstance(value_local, dict):
-            return {k: tool.decrypt_value(v, fernet) for k, v in value_local.items()}
-        return value_local
-
-    @staticmethod
     def installer(data_local:data) -> bool:
         install_path = os.path.join(os.getenv("APPDATA"), "CoreOS_Finace", "data") # Appdata Local App
         key_path = os.path.join(install_path, ".env","key.key")
@@ -116,7 +96,7 @@ class tool:
                 data_local.data_json_path = os.path.join(install_path, "data.json")
                 if not os.path.exists(data_local.data_json_path):
                     local_json = data_local.create_json(path=str(install_path))
-                    encrypt_json = tool.encrypt_value(value=local_json,fernet=fernet)
+                    encrypt_json = Critografy.encrypt_value(value=local_json,fernet=fernet)
 
                     if data_local.Debug:print(f"[WARN] Type Of Local Json: {type(encrypt_json)}")
                     
@@ -130,27 +110,6 @@ class tool:
         except PermissionError as E:
             raise PermissionError("[SUDO] Sudo Warn")
         
-    def is_encrypted(value: str) -> bool:
-        try:
-            # Tenta decodificar como base64 e ver se é um token válido do Fernet
-            base64.urlsafe_b64decode(value.encode())
-            return value.endswith("==") and len(value) > 100
-        except Exception:
-            return False
-    
-    @staticmethod
-    def encrypt_value(value, fernet: Fernet):
-        if isinstance(value, (str, int, float)):
-            text = str(value)
-            if isinstance(value, str) and tool.is_encrypted(value):
-                return value  # Já está criptografado
-            enc = fernet.encrypt(text.encode())
-            return base64.urlsafe_b64encode(enc).decode()
-        elif isinstance(value, list):
-            return [tool.encrypt_value(v, fernet) for v in value]
-        elif isinstance(value, dict):
-            return {k: tool.encrypt_value(v, fernet) for k, v in value.items()}
-        
     @staticmethod
     def save_json(data_local:data, fernet: Fernet) -> None:
         try:
@@ -158,7 +117,7 @@ class tool:
             """
             Salva o json_data criptografado em data_json_path.
             """
-            encrypt_json = tool.encrypt_value(data_local.json_data, fernet)
+            encrypt_json = Critografy.encrypt_value(data_local._json_data, fernet)
 
             # Grava no arquivo sobrescrevendo tudo
             with open(data_local.data_json_path, "w", encoding="utf-8") as file:
@@ -180,9 +139,8 @@ class tool:
     def openJson(data_local:data,fernet:Fernet) -> None:
         try:
             with open(data_local.data_json_path, "rb") as file:
-                data_local.json_data = json.loads(file.read())
-                data_local.json_data = tool.decrypt_value(value_local=data_local.json_data, fernet=fernet)     # ← CONVERTE de string JSON para dict
-                tool.clearJson(data_local) #Limpa o json para possibilitar a escrita das novas infos
+                data_local._json_data = json.loads(file.read())
+                data_local._json_data = Critografy.decrypt_value(value_local=data_local._json_data, fernet=fernet)     # ← CONVERTE de string JSON para dict
         except PermissionError as E:
             raise PermissionError("[SUDO] Sudo Permision")
         except Exception as E:

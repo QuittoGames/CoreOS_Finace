@@ -35,8 +35,8 @@ class Item:
     def generete_nunber(self,data_local:data) -> int:
         IDs = []
         for i in ["receita", "gastos"]:
-            if i in data_local.json_data:
-                IDs += [i["id"] for i in data_local.json_data[i] if i["id"] is not None] # Sum Arry [0,1,2,3] + [4,5,6,7] = [0,1,2,3,4,5,6,7] sim quase niguem lembra disso
+            if i in data_local._json_data:
+                IDs += [i["id"] for i in data_local._json_data[i] if i["id"] is not None] # Sum Arry [0,1,2,3] + [4,5,6,7] = [0,1,2,3,4,5,6,7] sim quase niguem lembra disso
         IDs.sort() #Usa Timshort e e otimizado em C logo vai ser mais rapdio do que escrever um quickshort
         while True:
             id_local = randint(0,1000)

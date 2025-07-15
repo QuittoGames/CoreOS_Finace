@@ -92,6 +92,7 @@ class Main(QMainWindow):
             key = data_local.getFernet()
             key = Fernet(key)
             user.saveUserInJson(data_local)
+            print(data_local._json_data)
             tool.save_json(data_local,key)
             if data_local.Debug: 
                 print("[DEBUG] save_json executado")

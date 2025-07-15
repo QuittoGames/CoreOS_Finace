@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from decimal import Decimal
+from decimal import Decimal,InvalidOperation
 import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -54,13 +54,16 @@ class User:
         #Open File Json
         tool.openJson(data_local,fernet)
 
-        if data_local.json_data["saldo"] is None or str(data_local.json_data["saldo"]).strip() == "":
-            if data_local.Debug:print("[WARN] Saldo inválido no JSON, usando 0.0")
-            self.saldo = Decimal("0.0")
-        else:
-            self.saldo = Decimal(str(data_local.json_data["saldo"]))
+        raw_saldo = data_local._json_data.get("saldo")
 
-        self.name = str(data_local.json_data["name"])
+        try:
+            self.saldo = Decimal(str(raw_saldo))
+        except (InvalidOperation, TypeError, ValueError):
+            if data_local.Debug:
+                print(f"[WARN] Saldo inválido no JSON ({raw_saldo}), usando 0.0")
+            self.saldo = Decimal("0.0")
+
+        self.name = str(data_local._json_data["name"])
         #For in Json
         #Refactor for mutiple funcs
         self.aplicacoes = [Aplicao(
@@ -71,7 +74,7 @@ class User:
             _min_aporte=Decimal(str(ap["min_aporte"])),
             _prazo_meses=ap["prazo_meses"],
             _liquidez=ap["liquidez"],
-        )for ap in data_local.json_data["aplicacoes"]if ap is not None] 
+        )for ap in data_local._json_data["aplicacoes"]if ap is not None] 
 
         self.gastos = [Item(
             _ID = Item.generete_nunber(data_local=data_local),
@@ -80,7 +83,7 @@ class User:
             _type = ap["type"],
             _coin = ap["coin"],
             _value = ap["value"],
-        ) for ap in data_local.json_data["gastos"]if ap is not None]
+        ) for ap in data_local._json_data["gastos"]if ap is not None]
 
         self.receita = [Item(
             _ID = Item.generete_nunber(data_local=data_local),
@@ -89,7 +92,7 @@ class User:
             _type = ap["type"],
             _coin = ap["coin"],
             _value = ap["value"],
-        ) for ap in data_local.json_data["receita"] if ap is not None]
+        ) for ap in data_local._json_data["receita"] if ap is not None]
 
         self.extrato = self.receita + self.gastos
     
@@ -110,7 +113,7 @@ class User:
 
     def setNameGUI(self,data_local:data):
         try:
-            if (str(data_local.json_data["name"]).strip().lower()) in ("", "none"):
+            if (str(data_local._json_data["name"]).strip().lower()) in ("", "none"):
                 dialog = NameDialog()
                 if dialog.exec() == QDialog.Accepted:
                     self.name = dialog.getName()
@@ -118,17 +121,49 @@ class User:
         except Exception as E:
             print(f"Erro Al inicar Login GUI, Erro: {E}")
 
-    #Fix
-    def saveUserInJson(self,data_local:data) -> None:
+    #Nao foi possivel aplicar em um for portanto teve quer feito na mao
+    def saveUserInJson(self, data_local: data) -> None:
         try:
-            atrr = [i for i in dir(self) if i not in self.NOT_ATTR_JSON]
+            data_local._json_data["name"] = self.name
+            data_local._json_data["saldo"] = str(self.saldo)  # Decimal → string
 
-            for i in atrr:
-                value = getattr(self, i)
-                data_local.json_data[i] = value
+            data_local._json_data["aplicacoes"] = [
+                {
+                    "name": ap._name,
+                    "taxa_juros": ap._taxa_juros,
+                    "type": ap._type,
+                    "moeda": ap._moeda,
+                    "min_aporte": str(ap._min_aporte),
+                    "prazo_meses": ap._prazo_meses,
+                    "liquidez": ap._liquidez
+                } for ap in self.aplicacoes
+            ]
 
-            if data_local.Debug: print(f"[DEBUG] Json Name: {data_local.json_data["name"]}")
-        except IndexError as E:
-            raise IndexError("Index out of range\n[FUNCTION]: tool.saveUserJson()")
+            data_local._json_data["receita"] = [
+                {
+                    "id": it._ID,
+                    "name": it._name,
+                    "descr": it._descr,
+                    "type": it._type,
+                    "coin": it._coin,
+                    "value": it._value
+                } for it in self.receita
+            ]
+
+            data_local._json_data["gastos"] = [
+                {
+                    "id": it._ID,
+                    "name": it._name,
+                    "descr": it._descr,
+                    "type": it._type,
+                    "coin": it._coin,
+                    "value": it._value
+                } for it in self.gastos
+            ]
+
+            if data_local.Debug:
+                print(f"[DEBUG] Json Name: {data_local._json_data['name']}")
+                print(f"[DEBUG] Json Saldo: {data_local._json_data['saldo']}")
+                print(f"[DEBUG] Json Aplicacoes: {len(data_local._json_data['aplicacoes'])} entradas")
         except Exception as E:
-            raise Exception(f"Nao foi possivel passar os dados parao json local, Erro: {E}")
+            raise Exception(f"Erro ao salvar usuário no JSON: {E}")
