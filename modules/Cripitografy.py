@@ -5,6 +5,7 @@ from cryptography.fernet import Fernet
 @dataclass
 class Critografy:
     
+    @staticmethod
     def is_encrypted(value: str) -> bool:
         try:
             # Tenta decodificar como base64 e ver se é um token válido do Fernet

@@ -159,7 +159,7 @@ class tool:
         try:
             subprocess.run([sys.executable, "index.py"])
         except PermissionError as E:
-            raise PermissionError("[SUDO] udo Permision")
+            raise PermissionError("[SUDO] Sudo Permision")
         except Exception as E:
             raise Exception("[ERROR] Error with open json file")
         

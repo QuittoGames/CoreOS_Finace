@@ -66,35 +66,47 @@ class User:
         self.name = str(data_local._json_data["name"])
         #For in Json
         #Refactor for mutiple funcs
-        self.aplicacoes = [Aplicao(
-            _name=str(ap["name"]),
-            _taxa_juros=ap["taxa_juros"],
-            _type=ap["type"],
-            _moeda=ap["moeda"],
-            _min_aporte=Decimal(str(ap["min_aporte"])),
-            _prazo_meses=ap["prazo_meses"],
-            _liquidez=ap["liquidez"],
-        )for ap in data_local._json_data["aplicacoes"]if ap is not None] 
+        try:
+            self.aplicacoes = [Aplicao(
+                _name=str(ap["name"]),
+                _taxa_juros=ap["taxa_juros"],
+                _type=ap["type"],
+                _moeda=ap["moeda"],
+                _min_aporte=Decimal(str(ap["min_aporte"])),
+                _prazo_meses=ap["prazo_meses"],
+                _liquidez=ap["liquidez"],
+            )for ap in data_local._json_data["aplicacoes"]if ap is not None] 
+        except (InvalidOperation, ValueError, TypeError) as E:
+            self.aplicacoes = []
+            if data_local.Debug:print(f"[WARN] Aplicação inválida ignorada, Erro: {E}")
 
-        self.gastos = [Item(
-            _ID = Item.generete_nunber(data_local=data_local),
-            _name = ap["name"],
-            _descr = ap["descr"],
-            _type = ap["type"],
-            _coin = ap["coin"],
-            _value = ap["value"],
-        ) for ap in data_local._json_data["gastos"]if ap is not None]
+        try:
+            self.gastos = [Item(
+                _ID = Item.generete_nunber(data_local=data_local) ,
+                _name = ap["name"],
+                _descr = ap["descr"],
+                _type = ap["type"],
+                _coin = ap["coin"],
+                _value = ap["value"],
+            ) for ap in data_local._json_data["gastos"]if ap is not None]
+        except (InvalidOperation, ValueError, TypeError) as E:
+            self.gastos = []
+            if data_local.Debug:print(f"[WARN] Gastos Item inválida ignorada, Erro: {E}")
 
-        self.receita = [Item(
-            _ID = Item.generete_nunber(data_local=data_local),
-            _name = ap["name"],
-            _descr = ap["descr"],
-            _type = ap["type"],
-            _coin = ap["coin"],
-            _value = ap["value"],
-        ) for ap in data_local._json_data["receita"] if ap is not None]
-
-        self.extrato = self.receita + self.gastos
+        try:
+            self.receita = [Item(
+                _ID = Item.generete_nunber(data_local=data_local),
+                _name = ap["name"],
+                _descr = ap["descr"],
+                _type = ap["type"],
+                _coin = ap["coin"],
+                _value = ap["value"],
+            ) for ap in data_local._json_data["receita"] if ap is not None]
+        except (InvalidOperation, ValueError, TypeError) as E:
+            self.receita = []
+            if data_local.Debug:print(f"[WARN] Receita inválida ignorada, Erro: {E}")
+            
+        self.extrato = self.receita + self.gastos if self.receita and self.gastos else []
     
         self.lucro = sum(Decimal(str(i._value)) for i in self.receita) - sum(Decimal(str(i._value)) for i in self.gastos)
         return
