@@ -13,6 +13,7 @@ from cryptography.fernet import Fernet
 from modules.Item import Item   
 from UI.Setname import NameDialog
 from PySide6.QtWidgets import QDialog
+from modules.Cripitografy import Critografy
 import json
 
 @dataclass
@@ -51,6 +52,7 @@ class User:
         if isinstance(key, str):key = key.encode() 
         fernet = Fernet(key=key)
 
+
         #Open File Json
         tool.openJson(data_local,fernet)
 
@@ -63,7 +65,16 @@ class User:
                 print(f"[WARN] Saldo inválido no JSON ({raw_saldo}), usando 0.0")
             self.saldo = Decimal("0.0")
 
-        self.name = str(data_local._json_data["name"])
+        # self.name = str(data_local._json_data["name"])
+        self.name = Critografy.decrypt_value(data_local._json_data["name"], fernet)
+        if data_local.Debug:
+            print(">>>> TESTE DESCRIPTOGRAFIA")
+
+            criptografado = data_local._json_data.get("name")
+            descriptografado = Critografy.decrypt_value(criptografado, fernet)
+            print(f"Name Original: {criptografado}")
+            print(f"Name Decrypt : {descriptografado}")
+            return
         #For in Json
         #Refactor for mutiple funcs
         try:
@@ -82,7 +93,7 @@ class User:
 
         try:
             self.gastos = [Item(
-                _ID = Item.generete_nunber(data_local=data_local) ,
+                _ID = Item.generete_nunber(data_local=data_local),
                 _name = ap["name"],
                 _descr = ap["descr"],
                 _type = ap["type"],
