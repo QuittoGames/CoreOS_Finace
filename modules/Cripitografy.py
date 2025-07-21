@@ -8,11 +8,12 @@ class Critografy:
     @staticmethod
     def is_encrypted(value: str) -> bool:
         try:
-            # Tenta decodificar como base64 e ver se é um token válido do Fernet
-            base64.urlsafe_b64decode(value.encode())
-            return value.endswith("==") and len(value) > 100
+            # Verifica se é uma string base64 válida e longa o suficiente
+            decoded = base64.urlsafe_b64decode(value.encode())
+            return value.endswith("==") and len(decoded) > 60  # comprimento típico de token Fernet
         except Exception:
             return False
+
     
     @staticmethod
     def encrypt_value(value, fernet: Fernet):
@@ -29,18 +30,20 @@ class Critografy:
         
         
     @staticmethod
-    def decrypt_value(value_local, fernet: Fernet) -> dict:
+    def decrypt_value(value_local, fernet: Fernet):
         if isinstance(value_local, str):
             try:
                 enc_bytes = base64.urlsafe_b64decode(value_local.encode())
                 dec = fernet.decrypt(enc_bytes).decode()
-                # Tenta converter pra número, se possível
-                if dec.isdigit():
-                    return int(dec)
+
+                # Tenta converter para número se possível
                 try:
-                    return float(dec)
-                except:
-                    return dec
+                    return int(dec)
+                except ValueError:
+                    try:
+                        return float(dec)
+                    except ValueError:
+                        return dec
             except Exception:
                 return value_local
         elif isinstance(value_local, list):

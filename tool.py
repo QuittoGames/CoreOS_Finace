@@ -74,24 +74,15 @@ class tool:
         install_path = os.path.join(os.getenv("APPDATA"), "CoreOS_Finace", "data") # Appdata Local App
         key_path = os.path.join(install_path, ".env","key.key")
         if data_local.Debug:print(f"[WARN] Key path exit: {os.path.exists(key_path)}")
-        #New Fernet Key
         #Camanda de segurança para ter varias keys diferentes
-        new_fernet_key = Fernet.generate_key()
-
-        if len(new_fernet_key) != 44: 
-            print(f"[ERROR] Key inválida, tamanho esperado 44 bytes, mas tem {len(key)}, Type: {type(new_fernet_key)}")
-            return False
-        fernet = Fernet(new_fernet_key) # The fernet clas cant is created in try 
-    
+        #     
         try:
             if not os.path.exists(install_path):
                 os.makedirs(install_path, exist_ok=True)
-                
-            if not os.path.exists(data_local.data_json_path) or not os.path.exists(key_path):
-                os.makedirs(os.path.dirname(key_path), exist_ok=True)
-                
-                with open(key_path, "wb") as key:
-                    key.write(new_fernet_key)
+
+            #New Fernet Key
+            fernet = data_local.genereteFernetKey(key_path)
+            if not os.path.exists(data_local.data_json_path):
 
                 data_local.data_json_path = os.path.join(install_path, "data.json")
                 if not os.path.exists(data_local.data_json_path):

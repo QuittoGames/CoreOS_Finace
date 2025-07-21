@@ -78,6 +78,29 @@ class data:
     def getFernet(self) -> str:
         return self._key_json
     
+    def genereteFernetKey(self,key_path) -> Fernet:
+        try:
+            if os.path.exists(key_path):
+                # Carrega chave existente
+                with open(key_path, "rb") as key_file:
+                    key = key_file.read()
+                if len(key) != 44:
+                    raise ValueError(f"Key inválida, tamanho esperado 44 bytes, mas tem {len(key)}")
+                return Fernet(key)
+            # Cria nova chave e salva
+            new_fernet_key = Fernet.generate_key()
+            if len(new_fernet_key) != 44:
+                raise ValueError(f"Key inválida, tamanho esperado 44 bytes, mas tem {len(new_fernet_key)}")
+            
+            os.makedirs(os.path.dirname(key_path), exist_ok=True)
+            with open(key_path, "wb") as key_file:
+                key_file.write(new_fernet_key)
+            return Fernet(new_fernet_key)
+        except PermissionError as E:
+            raise PermissionError("[SUDO] Permission Error")
+        except Exception as E:
+            raise Exception(f"[ERROR] Erro ao gerar ou carregar key: {E}")
+
     """Verifica se o arquivo data.json existe na pasta local; 
     se existir, define o caminho local como padrão, 
     senão usa o caminho na pasta APPDATA do sistema.
@@ -112,5 +135,4 @@ class data:
             print("Erro: Caminho não encontrado.")
         except OSError as e:
             print(f"Erro do sistema: {e}")
-
 
