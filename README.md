@@ -1,7 +1,7 @@
 <!-- 🚀 CoreOS Finance README.md -->
 
 [![Version](https://img.shields.io/badge/version-1.0v-blue.svg)](#)
-[![Stars](https://img.shields.io/github/stars/QuittoGames/CoreOS_Finance?style=social)](https://github.com/QuittoGames/CoreOS_Finance)
+[![Stars](https://img.shields.io/github/stars/QuittoGames/CoreOS_Finance?style=social)](https://github.com/QuittoGames/CoreOS_Finace)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](#)
 
 ---
