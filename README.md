@@ -1,148 +1,120 @@
 <!-- 🚀 CoreOS Finance README.md -->
 
 [![Version](https://img.shields.io/badge/version-1.0v-blue.svg)](#)
-[![Stars](https://img.shields.io/github/stars/QuittoGames/CoreOS_Finance?style=social)](https://github.com/QuittoGames/CoreOS_Finace)
+[![Stars](https://img.shields.io/github/stars/SeuUsuario/CoreOS_Finance?style=social)](https://github.com/SeuUsuario/CoreOS_Finance)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](#)
 
 ---
 
-## 📖 Sumário
+## 🚀 Sobre o CoreOS Finance
 
-* [Sobre](#-sobre)
-* [Demonstração](#-demonstração)
-* [Principais Funcionalidades](#-principais-funcionalidades)
-* [Download & Execução](#-download--execução)
-* [Instalação](#-instalação)
-* [Uso Básico](#-uso-básico)
-* [Contribuição](#-contribuição)
-* [Licença](#-licença)
-
----
-
-## 💡 Sobre
-
-O **CoreOS Finance** é parte do ecossistema **CoreOS**: uma torre de controle de apps que automatiza ações e gerencia seu PC com recursos de produtividade e segurança.
-Este módulo foca no **controle financeiro pessoal**, oferecendo:
+O **CoreOS Finance** faz parte do ecossistema **CoreOS**, uma “torre de controle” de apps para automatizar ações e gerenciar seu PC com recursos úteis de produtividade e segurança.
+Esta aplicação foca no **controle financeiro pessoal**, permitindo:
 
 * 📊 Registro de receitas e despesas
 * 💰 Visualização de saldo e extrato detalhado
-* 📈 Gestão de aplicações financeiras
-* 🔒 Criptografia dos dados sensíveis
+* 📈 Gerenciamento de aplicações financeiras
+* 🔒 Criptografia de dados sensíveis
 
-**Versão atual:** 1.0v
-**Branch de desenvolvimento:** [`dev`](https://github.com/QuittoGames/CoreOS_Finance/tree/dev)
-
----
-
-## 🎥 Demonstração
-
-![CoreOS Finance Demo](docs/demo.gif)
+Versão atual: **1.0v**
+Para acessar a versão mais recente em desenvolvimento, confira a branch [dev](https://github.com/SeuUsuario/CoreOS_Finance/tree/dev).
 
 ---
 
 ## 🔑 Principais Funcionalidades
 
-1. **Dashboard Intuitivo**
+1. **Dashboard Simples**
 
-   * Saldo, lucro e transações recentes em um clique.
-   * **Exemplo:**
+   * Exibe saldo, lucro e resumo de transações recentes.
+   * Exemplo de código para atualizar o saldo:
 
-     ```python
-     # Atualiza saldo no JSON
+     
+python
+     # User.py
      data_local._json_data["saldo"] = str(self.saldo)
-     ```
+
 
 2. **Cadastro de Itens (Receita/Gasto)**
 
-   * Geração automática de IDs únicos.
-   * **Exemplo:**
+   * Gera IDs únicos automaticamente.
+   * Exemplo de geração de ID:
 
-     ```python
+     
+python
      new_id = Item.generete_nunber(data_local)
-     ```
+
 
 3. **Gestão de Aplicações Financeiras**
 
-   * Configuração de nome, taxa, prazo, liquidez e aporte mínimo.
-   * **Exemplo:**
+   * Define nome, taxa de juros, prazo e liquidez.
+   * Visualização amigável:
 
-     ```python
+     
+python
      print(aplicacao)
-     # → [APLICAÇÃO FINANCEIRA] Nome: Poupança │ Juros: 4.5% │ ...
-     ```
+     # → [APLICAÇÃO FINANCEIRA] Nome: Poupança • Juros: 4.5% • …
 
-4. **Segurança Avançada**
 
-   * Criptografia via **Fernet** para strings, números e coleções.
-   * Proteção completa do `data.json`.
+4. **Segurança com Criptografia**
+
+   * Usa **Fernet** para criptografar/decriptografar strings, números e coleções.
+   * Protege dados no arquivo data.json.
 
 ---
 
-## 📥 Download & Execução
+## 📦 Instalação
 
-1. **Clone o repositório**
+1. Clone o repositório
 
-   ```bash
-   git clone https://github.com/QuittoGames/CoreOS_Finance.git
+   
+bash
+   git clone https://github.com/SeuUsuario/CoreOS_Finance.git
    cd CoreOS_Finance
-   ```
-2. **Instale dependências**
 
-   ```bash
-   python -m venv .venv            # Cria ambiente virtual
-   source .venv/bin/activate      # Linux/macOS
-   .venv\Scripts\activate       # Windows
-   pip install -r requirements.txt
-   ```
-3. **Execute a aplicação**
 
-   ```bash
+2. Crie um ambiente virtual e instale dependências
+
+   
+bash
+   python -m venv .venv
+   source .venv/bin/activate   # Linux / macOS
+   .venv\Scripts\activate      # Windows
+   pip install -r requirements/requirements.txt
+
+
+3. Execute a aplicação
+
+   
+bash
    python index.py
-   ```
 
----
-
-## 📦 Instalação (opcional)
-
-Se preferir instalar globalmente:
-
-```bash
-pip install CoreOS_Finance    # Após publicação no PyPI
-```
 
 ---
 
 ## 🛠️ Uso Básico
 
 1. **Primeiro acesso**: defina seu nome no diálogo inicial.
-2. **Nova transação**: clique em “+” e escolha Receita ou Gasto.
-3. **Extrato**: consulte o painel “Transações” para detalhes.
-4. **Aplicações**: crie ou edite investimentos.
+2. **Adicionar transação**: clique em “+” e escolha entre Receita ou Gasto.
+3. **Visualizar extrato**: acesse o painel “Transações” para detalhes.
+4. **Gerenciar aplicações**: vá em “Aplicações” para criar ou editar investimentos.
 
 ---
 
 ## 🤝 Contribuição
 
-1. Faça um **fork** deste repositório.
-2. Crie uma branch:
+Quer melhorar o CoreOS Finance?
 
-   ```bash
-   ```
+1. Fork este repositório.
+2. Crie uma branch (git checkout -b feature/nova-funcionalidade).
+3. Faça suas alterações e commit (git commit -m 'Adiciona nova feature').
+4. Abra um Pull Request contra a branch dev.
 
-git checkout -b feature/minha-nova-funcionalidade
-
-```
-3. Adicione commits claros e descritivos.
-4. Abra um **Pull Request** para a branch `dev`.
-```
 ---
 
 ## ⚖️ Licença
 
-Este projeto é licenciado sob a **MIT License**. Veja [LICENSE](LICENSE) para detalhes.
+Este projeto é licenciado sob a **MIT License**. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ---
 
-> Criado por **@QuittoGames** 🚀  
-
-```
+> Cirado Por @QuittoGames (Ou Quitto , nao cosigo mudar o nome .-.)
