@@ -68,7 +68,7 @@ class data:
                 if self.Debug: print("[NOTIFY] Key retrieved successfully")
                 if len(self._key_json) != 44: 
                       print(f"[ERROR] Key inválida, tamanho esperado 44 bytes, mas tem {len(self._key_json)}")
-
+                if self.Debug: print(f"[DEBUG] Fernet Key In getKey() -> bytes , {self._key_json}")
                 return self._key_json
         except FileNotFoundError as E:
             raise FileNotFoundError ("[ERROR] File Not Found in path")

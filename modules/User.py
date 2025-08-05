@@ -50,6 +50,7 @@ class User:
         
         key = data_local.getKey() 
         if isinstance(key, str):key = key.encode() 
+        print(key)
         fernet = Fernet(key=key)
 
 
