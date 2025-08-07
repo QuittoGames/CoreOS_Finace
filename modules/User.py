@@ -53,11 +53,10 @@ class User:
         print(key)
         fernet = Fernet(key=key)
 
-
         #Open File Json
         tool.openJson(data_local,fernet)
 
-        raw_saldo = data_local._json_data.get("saldo")
+        raw_saldo = data_local._json_data["saldo"]
 
         try:
             self.saldo = Decimal(str(raw_saldo))
@@ -68,14 +67,6 @@ class User:
 
         # self.name = str(data_local._json_data["name"])
         self.name = Critografy.decrypt_value(data_local._json_data["name"], fernet)
-        if data_local.Debug:
-            print(">>>> TESTE DESCRIPTOGRAFIA")
-
-            criptografado = data_local._json_data.get("name")
-            descriptografado = Critografy.decrypt_value(criptografado, fernet)
-            print(f"Name Original: {criptografado}")
-            print(f"Name Decrypt : {descriptografado}")
-            return
         #For in Json
         #Refactor for mutiple funcs
         try:
