@@ -182,3 +182,6 @@ class User:
                 print(f"[DEBUG] Json Aplicacoes: {len(data_local._json_data['aplicacoes'])} entradas")
         except Exception as E:
             raise Exception(f"Erro ao salvar usuário no JSON: {E}")
+
+    def __str__(self):
+        return f"Usuário: {self.name} | Saldo: R${self.saldo} | Lucro: R${self.lucro}"
