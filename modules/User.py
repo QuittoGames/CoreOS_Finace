@@ -52,7 +52,6 @@ class User:
         if isinstance(key, str):key = key.encode() 
         fernet = Fernet(key=key)
 
-
         #Open File Json
         tool.openJson(data_local,fernet)
 

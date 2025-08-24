@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 import os
 import json
-import base64
 from cryptography.fernet import Fernet
 
 
@@ -122,7 +121,7 @@ class data:
             raise FileNotFoundError("[ERROR] File Not Fond")
 
 
-    def create_json(self,path:str) -> None:
+    def create_json(self) -> None:
         path = os.path.join(path,"data.json")
         try:
             os.makedirs(os.path.dirname(self.data_json_path), exist_ok=True)
